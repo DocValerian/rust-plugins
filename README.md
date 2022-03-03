@@ -9,6 +9,11 @@ None of the plugins utilizes the umod i18n system! (currently)
 
 I will try and maintain, as well as improve and upgrade them as much as time permits. Feel free to contribute.
 
+
+## Discussions and Feedback
+Feel free to join the [ZN Discord](https://discord.gg/8tkBFRjg3W) to contact me for discussions and feedback etc.
+
+
 ## Contribute
 If you like, you can create PRs for changes and improvements you made to the plugins at any time. I am sure there will be things that need improvment ;)
 
