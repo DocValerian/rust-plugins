@@ -8,7 +8,7 @@ This plugin allows you to use the command /blood to bring up a UI in game that a
 * [Configuration](#Configuration)
 * [Planned_Features](#Planned_Features) 
 
-![screenshot](https://github.com/DocValerian/rust-plugins/assets/main/BloodUI.png?raw=true)
+![screenshot](https://github.com/DocValerian/rust-plugins/blob/main/assets/BloodUI.png?raw=true)
 
 ---
 
