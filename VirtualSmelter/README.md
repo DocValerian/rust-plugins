@@ -48,7 +48,7 @@ To remove a permission, use oxide.revoke <user or group> <name or steam id> <per
 ``virtualsmelter.use`` - grant access to all commands.
 
 ## Commands
-``/daily`` OR ``/dr`` - (can be freely configured) open the UI
+``/smelt`` - open the UI
 
 ## Configuration
 The configuration of this plugin is a bit more advanced, since the upgrades function in a very complex way and it takes a bit of
@@ -197,6 +197,7 @@ effect multipliers to the respective base values.
 
 ## Planned_Features
 * fully customizable currencies for upgrades
+* customizable chat command
 
 Feel free to open feature requests or PRs
 
