@@ -31,7 +31,7 @@ using Newtonsoft.Json;
 
 namespace Oxide.Plugins
 {
-    [Info("BloodUI", "DocValerian", "1.1.0")]
+    [Info("BloodUI", "DocValerian", "1.1.1")]
     class BloodUI : RustPlugin
     {
         static BloodUI Plugin;
@@ -81,6 +81,8 @@ namespace Oxide.Plugins
         {
             public int[] options = { 10, 100, 1000, 10000 };
             public bool onlyAtHome = false;
+            public string infoText = "Some Info here";
+            public string rpImgUrl = "http://m2v.eu/i/zn/rp1.png";
         }
         
         void Loaded()
@@ -90,6 +92,7 @@ namespace Oxide.Plugins
         private void OnServerInitialized()
         {
             bloodID = ItemManager.itemDictionaryByName["blood"].itemid;
+            ImageLibrary?.Call("ImportImageList", "bloodui", new Dictionary<string, string>() { ["rp_img"] = Cfg.rpImgUrl});
         }
         void Unload()
         {
@@ -498,7 +501,7 @@ namespace Oxide.Plugins
             {
                 Text =
                     {
-                        Text = "Blood is ingame currency.           1 Blood = 1 RP (Reward Point).          RP wipes montly!",
+                        Text = Cfg.infoText,
                         FontSize = 12,
                         Align = TextAnchor.MiddleCenter,
                         Color = "0.2 0.8 0 1"

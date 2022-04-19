@@ -31,7 +31,9 @@ The plugin does not currently use permissions
     1000,
     10000
   ],
-  "onlyAtHome": false
+  "onlyAtHome": false,
+  "infoText": "Some Info Here",
+  "rpImgUrl": "http://m2v.eu/i/zn/rp1.png"
 }
 ```
 **Options** define the stack sizes for the exchang
