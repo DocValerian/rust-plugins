@@ -34,7 +34,7 @@ using Newtonsoft.Json;
 
 namespace Oxide.Plugins
 {
-    [Info("TradeUI", "DocValerian", "1.7.0")]
+    [Info("TradeUI", "DocValerian", "1.7.1")]
     class TradeUI : RustPlugin
     {
         static TradeUI Plugin;
@@ -181,6 +181,13 @@ namespace Oxide.Plugins
             nfi.NumberDecimalDigits = 0;
 
             updateVendorList();
+        }
+        private void OnServerInitialized()
+        {
+            // preload item icons - this might be excessive, but the list is very dynamic otherwise
+            // this way the load should only happen once and have all icons prewarmed
+            List<KeyValuePair<string, ulong>> itemIconList = ItemManager.GetItemDefinitions().Select(itemDef => new KeyValuePair<string, ulong>(itemDef.shortname, 0)).ToList();
+            ImageLibrary.Call("LoadImageList", Title, itemIconList, null);
         }
         void Unload()
         {
@@ -687,10 +694,10 @@ namespace Oxide.Plugins
             {
                 if (v.net == null) continue;
                 if (!v.IsBroadcasting()) continue;
-                if(!Cfg.allowNPCs && v.OwnerID == 0) continue; 
-
-                v.globalBroadcast = true;
-                v.UpdateNetworkGroup();
+                if(!Cfg.allowNPCs && v.OwnerID == 0) continue;
+                // may no longer be required for global access
+                //v.globalBroadcast = true;
+                //v.UpdateNetworkGroup();
 
                 if (!VendorList.ContainsKey(v.net.ID))
                 {
@@ -724,8 +731,9 @@ namespace Oxide.Plugins
 
         private void OpenVendorUI(BasePlayer player, VendingMachine v)
         {
-            v.globalBroadcast = true;
-            v.UpdateNetworkGroup();
+            // may no longer be required for global access
+            //v.globalBroadcast = true;
+            //v.UpdateNetworkGroup();
             v.SendSellOrders(player);
             v.PlayerOpenLoot(player, v.customerPanel, false);
             Interface.CallHook("OnOpenVendingShop", (object)v, (object)player);
