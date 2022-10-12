@@ -695,9 +695,8 @@ namespace Oxide.Plugins
                 if (v.net == null) continue;
                 if (!v.IsBroadcasting()) continue;
                 if(!Cfg.allowNPCs && v.OwnerID == 0) continue;
-                // may no longer be required for global access
-                //v.globalBroadcast = true;
-                //v.UpdateNetworkGroup();
+                v.globalBroadcast = true;
+                v.UpdateNetworkGroup();
 
                 if (!VendorList.ContainsKey(v.net.ID))
                 {
@@ -731,9 +730,8 @@ namespace Oxide.Plugins
 
         private void OpenVendorUI(BasePlayer player, VendingMachine v)
         {
-            // may no longer be required for global access
-            //v.globalBroadcast = true;
-            //v.UpdateNetworkGroup();
+            v.globalBroadcast = true;
+            v.UpdateNetworkGroup();
             v.SendSellOrders(player);
             v.PlayerOpenLoot(player, v.customerPanel, false);
             Interface.CallHook("OnOpenVendingShop", (object)v, (object)player);
