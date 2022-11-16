@@ -8,22 +8,16 @@ I wrote for the server might be of use to someone out there.
 Of course, I will also not charge you anything for them. I build these as a relaxing hobby.
 
 Many of them were built purposefully to integrate into a very customized system and not with the intention of being published or sold at any point in time.
-Therefore some configuration and specific desgn decisions might be hard-coded (currently). 
-The Plugins were created over the last 3 years and with them my knowledge in Plugin development evolved, so some things will also not be fully optimizes (currently)
+Therefore some configuration and specific desgn decisions might be hard-coded. 
+The Plugins were created over the last 4 years and with them my knowledge in Plugin development evolved, so some things will also not be fully optimized.
 
-None of the plugins utilizes the umod i18n system! (currently)
+None of the plugins utilizes the umod i18n system!
 
 I will try and maintain, as well as improve and upgrade them as much as time permits. Feel free to contribute.
 
 ## Plugins to be released
-- **BuildManager** (an extensive building limitation toolkit, including agrade and repairall)
-- **TurretCommander** (a pvp oriented plugin for turret automation /tcmd)
-- **HomeCommander** (a general home automation QOL plugin /hcmd)
-- **HeliFromHell** (custom heli with queue and high-scores)
-- **InfinityVendor** (a small tool to allow for endless vending machines and fast trading)
-- **VirtualQuarries** (a virtual quarry system to remove the need for laggy ingame quarries)
-- **ZNExperience** (xp management system)
-- **ZNFarming** (a farming boost manager, integrated with ZNExperience)
+- None. All are either polished in their own folder, or under x_UnpolishedPlugins (18 plugins)
+- They might be updated at some point, but no guarantees here.
 
 ## Discussions and Feedback
 Feel free to join the [ZN Discord](https://discord.gg/8tkBFRjg3W) to contact me for discussions and feedback etc.
