@@ -34,7 +34,7 @@ using Newtonsoft.Json;
 
 namespace Oxide.Plugins
 {
-    [Info("TradeUI", "DocValerian", "1.7.1")]
+    [Info("TradeUI", "DocValerian", "1.7.2")]
     class TradeUI : RustPlugin
     {
         static TradeUI Plugin;
@@ -698,21 +698,21 @@ namespace Oxide.Plugins
                 v.globalBroadcast = true;
                 v.UpdateNetworkGroup();
 
-                if (!VendorList.ContainsKey(v.net.ID))
+                if (!VendorList.ContainsKey(v.net.ID.Value))
                 {
-                    VendorList.Add(v.net.ID, v);
+                    VendorList.Add(v.net.ID.Value, v);
                 }
                 foreach (ProtoBuf.VendingMachine.SellOrder sellOrder in v.sellOrders.sellOrders)
                 {
                     if (sellOrder.inStock < 1) continue;
                     if (VendorItemList.ContainsKey(sellOrder.itemToSellID))
                     {
-                        if (VendorItemList[sellOrder.itemToSellID].Contains(v.net.ID)) continue;
-                        VendorItemList[sellOrder.itemToSellID].Add(v.net.ID);
+                        if (VendorItemList[sellOrder.itemToSellID].Contains(v.net.ID.Value)) continue;
+                        VendorItemList[sellOrder.itemToSellID].Add(v.net.ID.Value);
                     }
                     else
                     {
-                        VendorItemList.Add(sellOrder.itemToSellID, new List<ulong>() { v.net.ID });
+                        VendorItemList.Add(sellOrder.itemToSellID, new List<ulong>() { v.net.ID.Value });
                     }
                     if (!categoryList.Contains(ItemManager.itemDictionary[sellOrder.itemToSellID].category.ToString("G")))
                     {
@@ -1422,7 +1422,7 @@ namespace Oxide.Plugins
                 {
                     Button =
                     {
-                        Command = "tradeui.openvendor " + v.net.ID,
+                        Command = "tradeui.openvendor " + v.net.ID.Value,
                         Color = "0.7 0.38 0 0.0"
                     },
                     RectTransform =
@@ -1492,7 +1492,7 @@ namespace Oxide.Plugins
                 {
                     Button =
                     {
-                        Command = "tradeui.openvendor " + v.net.ID,
+                        Command = "tradeui.openvendor " + v.net.ID.Value,
                         Color = "0.7 0.38 0 0.9"
                     },
                     RectTransform =
@@ -1697,7 +1697,7 @@ namespace Oxide.Plugins
                     {
                         Button =
                         {
-                            Command = "tradeui.editoffer " + v.net.ID + " " + getSellOrderId(v.net.ID, sellOrder),
+                            Command = "tradeui.editoffer " + v.net.ID.Value + " " + getSellOrderId(v.net.ID.Value, sellOrder),
                             Color = "0.7 0.38 0 1.0"
                         },
                         RectTransform =
@@ -1784,7 +1784,7 @@ namespace Oxide.Plugins
                     {
                         Button =
                         {
-                            Command = "tradeui.editoffer " + v.net.ID + " " + getSellOrderId(v.net.ID, sellOrder),
+                            Command = "tradeui.editoffer " + v.net.ID.Value + " " + getSellOrderId(v.net.ID.Value, sellOrder),
                             Color = "0.7 0.38 0 1.0"
                         },
                         RectTransform =
@@ -1939,7 +1939,7 @@ namespace Oxide.Plugins
                             Align = TextAnchor.MiddleLeft,
                             CharsLimit = 50,
                             Color = "1 1 1 1",
-                            Command = "tradeui.editofferinput "+ v.net.ID + " item "+ SellOrderId,
+                            Command = "tradeui.editofferinput "+ v.net.ID.Value + " item "+ SellOrderId,
                             FontSize = 10,
                             IsPassword = false,
                             Text = "test"
@@ -2005,7 +2005,7 @@ namespace Oxide.Plugins
                             Align = TextAnchor.MiddleLeft,
                             CharsLimit = 50,
                             Color = "1 1 1 1",
-                            Command = "tradeui.editofferinput "+ v.net.ID + " price "+ SellOrderId,
+                            Command = "tradeui.editofferinput "+ v.net.ID.Value + " price "+ SellOrderId,
                             FontSize = 10,
                             IsPassword = false,
                             Text = "test123"

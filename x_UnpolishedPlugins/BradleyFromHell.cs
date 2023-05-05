@@ -35,7 +35,7 @@ using Newtonsoft.Json;
 
 namespace Oxide.Plugins
 {
-    [Info("BradleyFromHell", "DocValerian", "1.6.1")]
+    [Info("BradleyFromHell", "DocValerian", "1.6.2")]
     class BradleyFromHell : RustPlugin
     {
         static BradleyFromHell Plugin { get; set; }
@@ -1097,7 +1097,7 @@ namespace Oxide.Plugins
 
                 string cratePrefab = "assets/prefabs/ammo/rocket/rocket_basic.prefab";
                 var entity = GameManager.server.CreateEntity(cratePrefab, spawnPoint2);
-                entity.OwnerID = currentBradley.net.ID;
+                entity.OwnerID = currentBradley.net.ID.Value;
                 if (entity == null) { return; }
 
                 entity.Spawn();

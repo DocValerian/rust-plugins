@@ -33,7 +33,7 @@ using Oxide.Core;
 
 namespace Oxide.Plugins
 {
-    [Info("AdmTools", "DocValerian", "1.0.35")]
+    [Info("AdmTools", "DocValerian", "1.0.36")]
     class AdmTools : RustPlugin
     {
         static AdmTools Plugin;
@@ -150,7 +150,7 @@ namespace Oxide.Plugins
             var priv = entity.GetBuildingPrivilege();
             if (priv == null || !(priv is BuildingPrivlidge) || entity is BasePlayer || entity.IsNpc) return null;
 
-            if (storedData.IndestructibleTCs.Contains(priv.net.ID))
+            if (storedData.IndestructibleTCs.Contains(priv.net.ID.Value))
             {
                 string m = ZNui?.Call<string>("CheckServerMode");
                 if (m == "PVE") return null;
@@ -231,9 +231,9 @@ namespace Oxide.Plugins
             BuildingPrivlidge privilege = player.GetBuildingPrivilege();
             if (!privilege) return;
 
-            if (!storedData.IndestructibleTCs.Contains(privilege.net.ID))
+            if (!storedData.IndestructibleTCs.Contains(privilege.net.ID.Value))
             {
-                storedData.IndestructibleTCs.Add(privilege.net.ID);
+                storedData.IndestructibleTCs.Add(privilege.net.ID.Value);
                 SendReply(player, "Building made Indestructible.");
             }
             SaveData();

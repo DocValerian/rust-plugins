@@ -29,7 +29,7 @@ using Oxide.Core.Plugins;
 
 namespace Oxide.Plugins
 {
-    [Info("LootBoxSpawner", "DocValerian", "1.3.26")]
+    [Info("LootBoxSpawner", "DocValerian", "1.3.27")]
     class LootBoxSpawner : RustPlugin
     {
         static LootBoxSpawner Plugin;
@@ -270,12 +270,12 @@ namespace Oxide.Plugins
             string prefabname = container.ShortPrefabName ?? string.Empty;
             if (prefabname.Contains("bradley_crate") || prefabname.Contains("supply_drop"))
             {
-                if (globalLootAssignments.ContainsKey(container.net.ID))
+                if (globalLootAssignments.ContainsKey(container.net.ID.Value))
                 {
                     string m = ZNui?.Call<string>("CheckServerMode");
                     if (m == "PVP" || m == "CHAOS") return null;
 
-                    if (globalLootAssignments[container.net.ID] == player.userID || player.IsAdmin)
+                    if (globalLootAssignments[container.net.ID.Value] == player.userID || player.IsAdmin)
                     {
                         return null;
                     }
@@ -290,10 +290,10 @@ namespace Oxide.Plugins
         }
         void OnLootEntityEnd(BasePlayer player, BaseCombatEntity entity)
         {
-            if (globalLootAssignments.ContainsKey(entity.net.ID))
+            if (globalLootAssignments.ContainsKey(entity.net.ID.Value))
             {
                 // clear protection if owner has looted the entity
-                globalLootAssignments.Remove(entity.net.ID);
+                globalLootAssignments.Remove(entity.net.ID.Value);
                 //SendReply(player, "You stopped looting, crate is no longer protected!");
                 StorageContainer loot = entity as StorageContainer;
                 if (loot != null)
@@ -558,7 +558,7 @@ namespace Oxide.Plugins
             rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             rigidbody.mass = 2f;
             rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-            globalLootAssignments.Add(entity.net.ID, player.userID);
+            globalLootAssignments.Add(entity.net.ID.Value, player.userID);
             return loot;
         }
 
@@ -591,7 +591,7 @@ namespace Oxide.Plugins
             rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             rigidbody.mass = 2f;
             rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-            globalLootAssignments.Add(entity.net.ID, player.userID);
+            globalLootAssignments.Add(entity.net.ID.Value, player.userID);
 
         }
         private void createSupplyDrop(BasePlayer player)
@@ -620,7 +620,7 @@ namespace Oxide.Plugins
                 }
             }
 
-            globalLootAssignments.Add(entity.net.ID, player.userID);
+            globalLootAssignments.Add(entity.net.ID.Value, player.userID);
 
 
         }
@@ -655,7 +655,7 @@ namespace Oxide.Plugins
                 rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                 rigidbody.mass = 2f;
                 rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-                globalLootAssignments.Add(entity.net.ID, player.userID);
+                globalLootAssignments.Add(entity.net.ID.Value, player.userID);
 
             });
 
@@ -691,7 +691,7 @@ namespace Oxide.Plugins
                 rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                 rigidbody.mass = 2f;
                 rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-                globalLootAssignments.Add(entity.net.ID, player.userID);
+                globalLootAssignments.Add(entity.net.ID.Value, player.userID);
 
             });
 

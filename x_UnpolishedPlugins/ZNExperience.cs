@@ -34,7 +34,7 @@ using Facepunch;
 
 namespace Oxide.Plugins
 {
-    [Info("ZNExperience", "DocValerian", "2.0.5")]
+    [Info("ZNExperience", "DocValerian", "2.0.6")]
     public class ZNExperience : RustPlugin
     {
         static ZNExperience Plugin;
@@ -186,6 +186,7 @@ namespace Oxide.Plugins
                 ["scientist"] = 40,
                 ["npc_tunneldweller"] = 40,
                 ["npc_underwaterdweller"] = 60,
+                ["scientistnpc_roam_nvg_variant"] = 60,
                 ["scientistnpc_junkpile_pistol"] = 40,
                 ["scientistnpc_full_lr300"] = 60,
                 ["scientistnpc_full_mp5"] = 60,
@@ -194,6 +195,7 @@ namespace Oxide.Plugins
                 ["scientistnpc_full_shotgun"] = 60,
                 ["scientistnpc"] = 40,
                 ["scientistnpc_oilrig"] = 30,
+                ["scientistnpc_cargo"] = 30,
                 ["scientistnpc_roamtethered"] = 40,
                 ["scientistnpc_roam"] = 40,
                 ["scientistnpc_patrol"] = 40,

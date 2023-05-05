@@ -28,7 +28,7 @@ using System.Text.RegularExpressions;
 
 namespace Oxide.Plugins
 {
-    [Info("BuildManager", "DocValerian", "1.12.5")]
+    [Info("BuildManager", "DocValerian", "1.12.6")]
     class BuildManager : RustPlugin
     {
         static BuildManager Plugin;
@@ -845,14 +845,14 @@ namespace Oxide.Plugins
             }
             string zone = "default";
             string msg = "<color=orange>=== Building Limit Exception: ===</color>";
-            if (storedData.ExceptionTcIds.Contains(privilege.net.ID))
+            if (storedData.ExceptionTcIds.Contains(privilege.net.ID.Value))
             {
-                storedData.ExceptionTcIds.Remove(privilege.net.ID);
+                storedData.ExceptionTcIds.Remove(privilege.net.ID.Value);
                 msg += "\n<color=red>REMOVED!</color>";
             }
             else
             {
-                storedData.ExceptionTcIds.Add(privilege.net.ID);
+                storedData.ExceptionTcIds.Add(privilege.net.ID.Value);
                 msg += "\n<color=green>ACTIVATED!</color>";
                 zone = "exception";
             }
@@ -883,7 +883,7 @@ namespace Oxide.Plugins
             Dictionary<string, float> dimensions = getBuildingDimensions(building);
             string currentZone = getCurrentZone(player, privilege);
             string msg = "<color=orange>=============== Check Building (/cb) ================</color>";
-            if (storedData.ExceptionTcIds.Contains(privilege.net.ID))
+            if (storedData.ExceptionTcIds.Contains(privilege.net.ID.Value))
             {
                 msg += "\n<color=red>Building uses exceptional limits!</color>";
                 currentZone = "exception";
@@ -1108,7 +1108,7 @@ namespace Oxide.Plugins
 
         private string getCurrentZone(BasePlayer player, BuildingPrivlidge privlidge){
             string currentZone = "default";
-            if(privlidge != null && storedData.ExceptionTcIds.Contains(privlidge.net.ID))
+            if(privlidge != null && storedData.ExceptionTcIds.Contains(privlidge.net.ID.Value))
             {
                 return "exception";
             }

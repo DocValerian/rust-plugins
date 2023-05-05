@@ -28,7 +28,7 @@ using System;
 
 namespace Oxide.Plugins
 {
-    [Info("InfinityVendor", "DocValerian", "1.2.0")]
+    [Info("InfinityVendor", "DocValerian", "1.2.1")]
     class InfinityVendor : RustPlugin
     {
         static InfinityVendor Plugin;
@@ -65,7 +65,7 @@ namespace Oxide.Plugins
         }
         object OnBuyVendingItem(VendingMachine machine, BasePlayer player, int sellOrderId, int numTransactions)
         {
-            if (!_storedData.InfinityMachines.Contains(machine.net.ID) 
+            if (!_storedData.InfinityMachines.Contains(machine.net.ID.Value) 
                 && !(machine is InvisibleVendingMachine)
                 && !(machine.OwnerID == 0)) 
                 return null;
@@ -169,7 +169,7 @@ namespace Oxide.Plugins
 
             foreach (VendingMachine v in Vendors)
             {
-                vendingMachineId = v.net.ID;
+                vendingMachineId = v.net.ID.Value;
                 var priv = v.GetBuildingPrivilege();
                 if (priv == null || !priv.IsAuthed(player)) continue;
                 if (!_storedData.InfinityMachines.Contains(vendingMachineId))
@@ -200,7 +200,7 @@ namespace Oxide.Plugins
             {
                 if (entity != null && entity is VendingMachine)
                 {
-                    vendingMachineId = (entity as VendingMachine).net.ID;
+                    vendingMachineId = (entity as VendingMachine).net.ID.Value;
                     if (!_storedData.InfinityMachines.Contains(vendingMachineId)) {
                         _storedData.InfinityMachines.Add(vendingMachineId);
                         SendReply(player, "Vending Machine is set to <color=green>infinity</color>");

@@ -30,7 +30,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Oxide.Plugins
 {
-    [Info("HomeCommander", "DocValerian", "1.0.13")]
+    [Info("HomeCommander", "DocValerian", "1.0.14")]
     class HomeCommander : RustPlugin
     {
         static HomeCommander Plugin;
@@ -315,11 +315,11 @@ namespace Oxide.Plugins
             foreach (AnimatedBuildingBlock entity in list)
             {
                 // vis will find the entity multiple times
-                if (doors.ContainsKey(entity.net.ID) || entity.OwnerID == 0) continue;
+                if (doors.ContainsKey(entity.net.ID.Value) || entity.OwnerID == 0) continue;
                 // only works on player owned entities
                 if (entity.OwnerID == player.userID || (clanMates != null && clanMates.Contains(entity.OwnerID.ToString())) || player.IsAdmin)
                 {
-                    doors.Add(entity.net.ID, entity);
+                    doors.Add(entity.net.ID.Value, entity);
                 }
 
             }
