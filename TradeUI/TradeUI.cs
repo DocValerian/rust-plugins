@@ -34,7 +34,7 @@ using Newtonsoft.Json;
 
 namespace Oxide.Plugins
 {
-    [Info("TradeUI", "DocValerian", "1.7.2")]
+    [Info("TradeUI", "DocValerian", "1.7.3")]
     class TradeUI : RustPlugin
     {
         static TradeUI Plugin;
@@ -380,6 +380,7 @@ namespace Oxide.Plugins
                 v.SendNetworkUpdate(BasePlayer.NetworkQueue.Update);
             }
             */
+            player.net.SwitchSecondaryGroup(v.net.group);
             player.ClientRPCPlayer(null, player, "RPC_OpenShop", Convert.ToUInt64(vendorNetId));
             OpenVendorUI(player, v);
             currentPlayerFav[player.userID] = new FavoriteItem { vendorNetId = vendorNetId, consoleCommand = "tradeui.openvendor" };
@@ -695,8 +696,13 @@ namespace Oxide.Plugins
                 if (v.net == null) continue;
                 if (!v.IsBroadcasting()) continue;
                 if(!Cfg.allowNPCs && v.OwnerID == 0) continue;
-                v.globalBroadcast = true;
-                v.UpdateNetworkGroup();
+                // v.globalBroadcast = true;
+                // v.UpdateNetworkGroup();
+                if(v.globalBroadcast)
+                {
+                    v.globalBroadcast = false;
+                    v.UpdateNetworkGroup();
+                }
 
                 if (!VendorList.ContainsKey(v.net.ID.Value))
                 {
@@ -730,8 +736,13 @@ namespace Oxide.Plugins
 
         private void OpenVendorUI(BasePlayer player, VendingMachine v)
         {
-            v.globalBroadcast = true;
-            v.UpdateNetworkGroup();
+            // v.globalBroadcast = true;
+            // v.UpdateNetworkGroup();
+            if(v.globalBroadcast)
+            {
+                v.globalBroadcast = false;
+                v.UpdateNetworkGroup();
+            }
             v.SendSellOrders(player);
             v.PlayerOpenLoot(player, v.customerPanel, false);
             Interface.CallHook("OnOpenVendingShop", (object)v, (object)player);
