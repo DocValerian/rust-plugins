@@ -28,7 +28,7 @@ using System.Text.RegularExpressions;
 
 namespace Oxide.Plugins
 {
-    [Info("BuildManager", "DocValerian", "1.12.6")]
+    [Info("BuildManager", "DocValerian", "1.12.7")]
     class BuildManager : RustPlugin
     {
         static BuildManager Plugin;
@@ -1012,7 +1012,7 @@ namespace Oxide.Plugins
         private void refundBuildingBlock(BasePlayer player, BuildingBlock buildingBlock)
         {
             var itemsToGive = new Dictionary<int, int>();
-            foreach (var itemAmount in buildingBlock.blockDefinition.grades[0].costToBuild)
+            foreach (var itemAmount in buildingBlock.blockDefinition.grades[0].CostToBuild())
             {
                 if (!itemsToGive.ContainsKey(itemAmount.itemid))
                 {
@@ -1036,7 +1036,7 @@ namespace Oxide.Plugins
                 items = null;
                 return "";
             }
-            foreach (var itemAmount in buildingBlock.blockDefinition.grades[buildingGrade].costToBuild)
+            foreach (var itemAmount in buildingBlock.blockDefinition.grades[buildingGrade].CostToBuild())
             {
                 if (!itemsToTake.ContainsKey(itemAmount.itemid))
                 {
