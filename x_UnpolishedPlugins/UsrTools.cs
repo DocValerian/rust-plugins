@@ -28,7 +28,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("UsrTools", "DocValerian", "1.3.1")]
+    [Info("UsrTools", "DocValerian", "1.3.2")]
     internal class UsrTools : RustPlugin
     {
         private static UsrTools Plugin;
@@ -362,9 +362,9 @@ namespace Oxide.Plugins
                     }
                 }
 
-                else if (entity != null && entity is MiniCopter)
+                else if (entity != null && entity is Minicopter)
                 {
-                    MiniCopter target = (MiniCopter)entity;
+                    Minicopter target = (Minicopter)entity;
 
                     BuildingManager.Building building = privilege.GetBuilding();
                     if (building.buildingBlocks.Count < 30)
@@ -376,11 +376,11 @@ namespace Oxide.Plugins
                     {
                         target.Kill(BaseNetworkable.DestroyMode.Gib);
                         Vector3 originalPosition = target.transform.position;
-                        Puts("[GETOUT] " + player + " at " + originalPosition + " killed a MiniCopter " + target);
+                        Puts("[GETOUT] " + player + " at " + originalPosition + " killed a Minicopter " + target);
                     }
                     else
                     {
-                        SendReply(player, "This MiniCopter has a right to be here! (Owner TC auth)");
+                        SendReply(player, "This Minicopter has a right to be here! (Owner TC auth)");
                     }
                 }
                 else

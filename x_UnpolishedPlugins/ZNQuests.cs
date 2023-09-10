@@ -34,7 +34,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Oxide.Plugins
 {
-    [Info("ZNQuests", "DocValerian", "1.2.4")]
+    [Info("ZNQuests", "DocValerian", "1.2.5")]
     class ZNQuests : RustPlugin
     {
         static ZNQuests Plugin;
@@ -926,7 +926,7 @@ namespace Oxide.Plugins
             //check & Update ProfileManager
             if (_qm.ContainsKey(player.userID))
             {
-                Item costItem = player.inventory.FindItemID(costItemId);
+                Item costItem = player.inventory.FindItemByItemID(costItemId);
                 QuestManager qm = _qm[player.userID];
                 if (qm.questsCompleted == 0 || qm.questsCompleted == qm.questsClaimed) return;
                 if (!qm.HasQuest(qid)) return;

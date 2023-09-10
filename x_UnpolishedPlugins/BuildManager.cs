@@ -740,7 +740,6 @@ namespace Oxide.Plugins
             }
             if (args.Length == 1)
             {
-                string sayYes;
                 if (args[0] != "yes")
                 {
                     repallUsageInfo(player);

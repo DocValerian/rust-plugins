@@ -37,7 +37,7 @@ using UnityEngine.SceneManagement;
 
 namespace Oxide.Plugins
 {
-    [Info("HeliFromHell", "DocValerian", "1.5.3")]
+    [Info("HeliFromHell", "DocValerian", "1.5.4")]
     class HeliFromHell : RustPlugin
     {
         static HeliFromHell Plugin;
@@ -202,7 +202,7 @@ namespace Oxide.Plugins
 
 
         #region Data  
-        private BaseHelicopter currentHeli;
+        private PatrolHelicopter currentHeli;
         private PatrolHelicopterAI currentHeliAI;
         private string currentHeliLevel;
         private BasePlayer currentHeliOwner;
@@ -410,7 +410,7 @@ namespace Oxide.Plugins
                 msg += "\nCurrent heli health (core): \t\t\t" + Math.Ceiling(currentHeli.health) + "/" + currentHeli._maxHealth;
 
 
-                foreach (BaseHelicopter.weakspot weakspot in currentHeli.weakspots)
+                foreach (PatrolHelicopter.weakspot weakspot in currentHeli.weakspots)
                 {
                     msg += "\nWeakspot health: \t\t\t" + Math.Ceiling(weakspot.health) + "/" + weakspot.maxHealth;
                 }
@@ -644,7 +644,7 @@ namespace Oxide.Plugins
             if (entity == currentHeli || info?.Initiator == currentHeli)
             {
                 BasePlayer player = info?.Initiator as BasePlayer;
-                BaseHelicopter heli = info?.Initiator as BaseHelicopter;
+                PatrolHelicopter heli = info?.Initiator as PatrolHelicopter;
                 if (player != null)
                 {
                     if (!HasSteaksInHeli((BaseEntity)player))
@@ -768,7 +768,7 @@ namespace Oxide.Plugins
             {
                 entity.Kill();
             }
-            if (entity is BaseHelicopter && (currentHeli == null || currentHeli != entity))
+            if (entity is PatrolHelicopter && (currentHeli == null || currentHeli != entity))
             {
                 Puts("Killing public Heli with no owner");
                 entity.Kill();
@@ -872,7 +872,7 @@ namespace Oxide.Plugins
             return player;
         }
 
-        private void adjustHeliPower(BaseHelicopter heli)
+        private void adjustHeliPower(PatrolHelicopter heli)
         {
             string heliLevel = currentHeliLevel;
 
@@ -888,7 +888,7 @@ namespace Oxide.Plugins
             heli.maxCratesToSpawn = 0;
             heli.bulletDamage *= damageScale;
 
-            foreach (BaseHelicopter.weakspot weakspot in heli.weakspots)
+            foreach (PatrolHelicopter.weakspot weakspot in heli.weakspots)
             {
                 float weakhealth = (heliHealth / 100) * Cfg.HeliLevels[heliLevel]["heliWeakspotHealthPercent"];
                 weakspot.maxHealth = weakhealth;
@@ -908,7 +908,7 @@ namespace Oxide.Plugins
             return playerPos + new Vector3(spawnX, 40, spawnZ);
         }
 
-        private static BaseHelicopter InstantiateEntity(Vector3 position)
+        private static PatrolHelicopter InstantiateEntity(Vector3 position)
         {
             var prefabName = "assets/prefabs/npc/patrol helicopter/patrolhelicopter.prefab";
             var prefab = GameManager.server.FindPrefab(prefabName);
@@ -926,13 +926,13 @@ namespace Oxide.Plugins
             {
                 go.SetActive(true);
             }
-            return go.GetComponent<BaseHelicopter>();
+            return go.GetComponent<PatrolHelicopter>();
         }
         private bool CallHeliForPlayer(BasePlayer player, string heliLevel = "normal")
         {
             var heliPos = getRandomSpawn(player);
 
-            //currentHeli = GameManager.server.CreateEntity("assets/prefabs/npc/patrol helicopter/patrolhelicopter.prefab", new Vector3(), new Quaternion(), true) as BaseHelicopter;
+            //currentHeli = GameManager.server.CreateEntity("assets/prefabs/npc/patrol helicopter/patrolhelicopter.prefab", new Vector3(), new Quaternion(), true) as PatrolHelicopter;
             currentHeli = InstantiateEntity(heliPos);
             if (!currentHeli) return false;
             currentHeliAI = currentHeli.GetComponent<PatrolHelicopterAI>();
@@ -1016,7 +1016,7 @@ namespace Oxide.Plugins
             float health = currentHeli.health;
             float maxHealth = currentHeli._maxHealth;
 
-            foreach (BaseHelicopter.weakspot weakspot in currentHeli.weakspots)
+            foreach (PatrolHelicopter.weakspot weakspot in currentHeli.weakspots)
             {
                 health += weakspot.health;
                 maxHealth += weakspot.maxHealth;
@@ -1078,7 +1078,7 @@ namespace Oxide.Plugins
             currentUITimer?.Destroy();
             resetUI();
             heliRedirectionTimer.Destroy();
-            currentHeli = (BaseHelicopter)null;
+            currentHeli = (PatrolHelicopter)null;
             currentHeliOwner = (BasePlayer)null;
             currentHeliAI = (PatrolHelicopterAI)null;
             currentHeliLevel = string.Empty;
@@ -1687,7 +1687,7 @@ namespace Oxide.Plugins
                 var secondsFighting = Math.Floor((DateTime.Now - currentHeliSpawnTime).TotalSeconds);
                 var secondsTilSurrender = Math.Floor(getNoDamageSurrenderTime() - (DateTime.Now - lastDamageTime).TotalSeconds);
                 string msg = "";
-                foreach (BaseHelicopter.weakspot weakspot in currentHeli.weakspots)
+                foreach (PatrolHelicopter.weakspot weakspot in currentHeli.weakspots)
                 {
                     msg += "(" + Math.Ceiling(weakspot.health) + "/" + weakspot.maxHealth + ") \n";
                 }

@@ -31,7 +31,7 @@ using Newtonsoft.Json;
 
 namespace Oxide.Plugins
 {
-    [Info("BloodUI", "DocValerian", "1.1.1")]
+    [Info("BloodUI", "DocValerian", "1.1.2")]
     class BloodUI : RustPlugin
     {
         static BloodUI Plugin;
@@ -167,7 +167,7 @@ namespace Oxide.Plugins
                 return;
             }
 
-            Item blood = player.inventory.FindItemID(bloodID);
+            Item blood = player.inventory.FindItemByItemID(bloodID);
             int bloodAmount = player.inventory.containerMain.GetAmount(bloodID, true);
             // safety from overbyuing
             if (blood == null || bloodAmount < 1)

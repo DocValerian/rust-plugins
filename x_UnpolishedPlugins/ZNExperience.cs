@@ -34,7 +34,7 @@ using Facepunch;
 
 namespace Oxide.Plugins
 {
-    [Info("ZNExperience", "DocValerian", "2.0.7")]
+    [Info("ZNExperience", "DocValerian", "2.0.8")]
     public class ZNExperience : RustPlugin
     {
         static ZNExperience Plugin;
@@ -352,7 +352,7 @@ namespace Oxide.Plugins
             {
                 if (_pm.ContainsKey(player.userID))
                 {
-                    Item papers = player.inventory.FindItemID(PAPERID);
+                    Item papers = player.inventory.FindItemByItemID(PAPERID);
                     // safety from overbyuing
                     if (papers == null || papers.amount < 1)
                     {
@@ -488,7 +488,7 @@ namespace Oxide.Plugins
 
             if (_pm.ContainsKey(player.userID))
             {
-                Item papers = player.inventory.FindItemID(PAPERID);
+                Item papers = player.inventory.FindItemByItemID(PAPERID);
                 ProfileManager p = _pm[player.userID];
                 // safety from overbyuing
                 if (papers == null || papers.amount < 1)
@@ -525,7 +525,7 @@ namespace Oxide.Plugins
             {
                 ProfileManager p = _pm[player.userID];
                 int amount = 0;
-                var slots = player.inventory.FindItemIDs(PAPERID);
+                var slots = player.inventory.FindItemsByItemID(PAPERID);
                 foreach (var slot in slots)
                 {
                     if (slot == null)
@@ -2842,7 +2842,7 @@ namespace Oxide.Plugins
             localContentStart -= 0.04f;
 
             int currentPapers = 0;
-            var slots = player.inventory.FindItemIDs(PAPERID);
+            var slots = player.inventory.FindItemsByItemID(PAPERID);
             foreach (var slot in slots)
             {
                 if (slot == null)

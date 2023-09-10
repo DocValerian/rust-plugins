@@ -30,7 +30,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Oxide.Plugins
 {
-    [Info("HomeCommander", "DocValerian", "1.0.14")]
+    [Info("HomeCommander", "DocValerian", "1.0.15")]
     class HomeCommander : RustPlugin
     {
         static HomeCommander Plugin;
@@ -382,7 +382,7 @@ namespace Oxide.Plugins
 
         private bool HasCodeLock(BasePlayer Player, int amount)
         {
-            Item i = Player.inventory.FindItemID(1159991980);
+            Item i = Player.inventory.FindItemByItemID(1159991980);
             if (i == null) return false;
             return i.amount >= amount;
         }

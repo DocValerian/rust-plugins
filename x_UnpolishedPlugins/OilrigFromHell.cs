@@ -31,7 +31,7 @@ using UnityEngine.SceneManagement;
 
 namespace Oxide.Plugins
 {
-    [Info("OilrigFromHell", "DocValerian", "1.4.2")]
+    [Info("OilrigFromHell", "DocValerian", "1.4.3")]
     class OilrigFromHell : RustPlugin
     {
         static OilrigFromHell Plugin;
@@ -91,7 +91,7 @@ namespace Oxide.Plugins
 
                 ItemContainer inv = ((DroppedItemContainer)entity).inventory;
                 if (inv.GetAmount(med_item_ID, false) == 0) return;
-                var itm = inv.FindItemsByItemName("syringe.medical");
+                var itm = inv.FindItemByItemName("syringe.medical");
                 if (itm == null) return;
                 inv.Remove(itm);
 

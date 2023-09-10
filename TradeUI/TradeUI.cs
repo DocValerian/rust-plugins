@@ -34,7 +34,7 @@ using Newtonsoft.Json;
 
 namespace Oxide.Plugins
 {
-    [Info("TradeUI", "DocValerian", "1.7.3")]
+    [Info("TradeUI", "DocValerian", "1.7.5")]
     class TradeUI : RustPlugin
     {
         static TradeUI Plugin;
@@ -633,9 +633,9 @@ namespace Oxide.Plugins
             int num2 = source1.Sum<Item>((Func<Item, int>)(x => x.amount));
             if (num1 > num2)
                 return false;
-            List<Item> source2 = buyer.inventory.FindItemIDs(sellOrder.currencyID);
+            List<Item> source2 = buyer.inventory.FindItemsByItemID(sellOrder.currencyID);
             if (sellOrder.currencyIsBP)
-                source2 = buyer.inventory.FindItemIDs(vm.blueprintBaseDef.itemid).Where<Item>((Func<Item, bool>)(x => x.blueprintTarget == sellOrder.currencyID)).ToList<Item>();
+                source2 = buyer.inventory.FindItemsByItemID(vm.blueprintBaseDef.itemid).Where<Item>((Func<Item, bool>)(x => x.blueprintTarget == sellOrder.currencyID)).ToList<Item>();
             List<Item> list = source2.Where<Item>((Func<Item, bool>)(x =>
             {
                 if (!x.hasCondition)
