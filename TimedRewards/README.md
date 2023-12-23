@@ -18,7 +18,6 @@ You can use PlaytimeTracker features to decide if AFK farming should be allowed.
 ---
 
 ## Dependencies
-- [ImageLibrary](https://umod.org/plugins/image-library)
 - [PlaytimeTracker](https://umod.org/plugins/playtime-tracker)
 
 ## Permissions

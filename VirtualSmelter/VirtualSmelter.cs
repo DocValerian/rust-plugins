@@ -31,13 +31,13 @@ using System.Globalization;
 
 namespace Oxide.Plugins
 {
-    [Info("VirtualSmelter", "DocValerian", "1.3.0")]
+    [Info("VirtualSmelter", "DocValerian", "1.3.5")]
     class VirtualSmelter : RustPlugin
     {
         static VirtualSmelter Plugin;
 
         [PluginReference]
-        private Plugin ImageLibrary, ServerRewards;
+        private Plugin ServerRewards;
         private const string permUse = "virtualsmelter.use";
         bool HasPermission(string id, string perm) => permission.UserHasPermission(id, perm);
 
@@ -78,7 +78,7 @@ namespace Oxide.Plugins
         }
 
         static ConfigFile Cfg = new ConfigFile();
-        class ConfigFile 
+        class ConfigFile
         {
             [JsonProperty(PropertyName = "Fuel consumption per slot level per minute")]
             public int FuelPerSlotLevel = 70;
@@ -190,7 +190,7 @@ namespace Oxide.Plugins
                     },
                     [6] = new Dictionary<string, float>()
                     {
-                        ["effect"] =7f,
+                        ["effect"] = 7f,
                         ["price"] = 60f
                     },
                     [7] = new Dictionary<string, float>()
@@ -346,7 +346,7 @@ namespace Oxide.Plugins
             ["hqm_out"] = "metal.refined",
             ["wood_out"] = "charcoal",
         };
-        
+
         private Dictionary<string, string> humanNames = new Dictionary<string, string>()
         {
             ["stone"] = "Stones",
@@ -366,10 +366,10 @@ namespace Oxide.Plugins
             ["efficiency"] = "Ore->Resource Efficiency",
             ["slots"] = "Extra Smelting Slots",
             ["effect_level"] = "BaseStats* x",
-            ["effect_speed"] = "Output & Fuel (x"+Cfg.SpeedFuelMultiplyer+") x",
+            ["effect_speed"] = "Output & Fuel (x" + Cfg.SpeedFuelMultiplyer + ") x",
             ["effect_fuel"] = "Fuel Consumption x",
             ["effect_efficiency"] = "Resource per 1 Ore x",
-            ["effect_slots"] = "Smelting slots x",  
+            ["effect_slots"] = "Smelting slots x",
             ["metal_out"] = "Metal Fragments",
             ["sulfur_out"] = "Sulfur",
             ["hqm_out"] = "High Quality Metal",
@@ -383,7 +383,7 @@ namespace Oxide.Plugins
             ["wood"] = -151838493,
             ["charcoal"] = -1938052175,
             ["diesel"] = 1568388703,
-            ["mill"] = 	-1819763926,
+            ["mill"] = -1819763926,
             ["tcomp"] = 1523195708,
             ["furnace"] = -1992717673,
             ["metal"] = -4031221,
@@ -402,10 +402,10 @@ namespace Oxide.Plugins
             ["sulfur.ore"] = "sulfur",
             ["wood"] = "charcoal"
         };
-        
-        private string[] uiElements = 
+
+        private string[] uiElements =
         {
-            "VirtualSmelter"+"_head", 
+            "VirtualSmelter"+"_head",
             "VirtualSmelter"+"_control",
             "VirtualSmelter"+"_foot",
             "VirtualSmelter"+"_slot_0",
@@ -424,10 +424,10 @@ namespace Oxide.Plugins
         };
 
         private const string globalNoErrorString = "none";
-        
+
         private Dictionary<ulong, FurnaceManager> _furnaceManager = new Dictionary<ulong, FurnaceManager>();
 
-        private DateTime _wipeTime; 
+        private DateTime _wipeTime;
 
         private HashSet<BasePlayer> UiPlayers = new HashSet<BasePlayer>();
         private Dictionary<ulong, Timer> playerTimer = new Dictionary<ulong, Timer>();
@@ -442,10 +442,10 @@ namespace Oxide.Plugins
             permission.RegisterPermission(permUse, this);
             nfi.NumberDecimalSeparator = ",";
             nfi.NumberGroupSeparator = ".";
-            nfi.NumberDecimalDigits  = 0;
+            nfi.NumberDecimalDigits = 0;
         }
         void OnPlayerDisconnected(BasePlayer player) => killUI(player);
-        
+
         void Unload()
         {
             foreach (var player in UiPlayers.ToList())
@@ -453,16 +453,16 @@ namespace Oxide.Plugins
                 killUI(player);
             }
         }
-        private static void LoadData<T>(out T data, string filename = null) => 
+        private static void LoadData<T>(out T data, string filename = null) =>
         data = Interface.Oxide.DataFileSystem.ReadObject<T>(filename ?? "VirtualSmelter");
 
-        private static void SaveData<T>(T data, string filename = null) => 
+        private static void SaveData<T>(T data, string filename = null) =>
         Interface.Oxide.DataFileSystem.WriteObject(filename ?? "VirtualSmelter", data);
 
         #endregion
 
         #region Commands
-        
+
         [ConsoleCommand("virtualsmelter.upgrade")]
         private void CmdUpgrade(ConsoleSystem.Arg arg)
         {
@@ -472,8 +472,8 @@ namespace Oxide.Plugins
 
             string errorMsg = globalNoErrorString;
             string upgradeType = arg.GetString(0);
-            
-            if(Cfg.UpgradeCurrency[upgradeType] == "RP")
+
+            if (Cfg.UpgradeCurrency[upgradeType] == "RP")
             {
                 errorMsg = upgradeWithRp(player, upgradeType);
             }
@@ -483,11 +483,11 @@ namespace Oxide.Plugins
             }
             reloadControlUI(player, errorMsg);
 
-            if(upgradeType == "slots" || upgradeType == "level")
-            {    
+            if (upgradeType == "slots" || upgradeType == "level")
+            {
                 FurnaceManager fm = FurnaceManager.Get(player.userID);
-                if(upgradeType != "slots" && fm.currentLevel != 1) return;
-                reloadSlotUI(player, (fm.Slots.Count()-1), errorMsg);
+                if (upgradeType != "slots" && fm.currentLevel != 1) return;
+                reloadSlotUI(player, (fm.Slots.Count() - 1), errorMsg);
             }
         }
 
@@ -498,16 +498,16 @@ namespace Oxide.Plugins
 
             string errorMsg = globalNoErrorString;
             object bal = ServerRewards?.Call("CheckPoints", player.userID);
-            if(bal == null) return "Error fetching RP balance";
+            if (bal == null) return "Error fetching RP balance";
             int playerRP = (int)bal;
 
-            if(playerRP < buyPrice)
+            if (playerRP < buyPrice)
             {
                 errorMsg = "This upgrade costs " + buyPrice + " RP, you only have " + playerRP;
             }
             else
-            {   
-                if(fm.doUpgrade(upgradeType))
+            {
+                if (fm.doUpgrade(upgradeType))
                 {
                     ServerRewards?.Call("TakePoints", player.userID, buyPrice);
                 }
@@ -523,16 +523,17 @@ namespace Oxide.Plugins
         {
             string errorMsg = globalNoErrorString;
             FurnaceManager fm = FurnaceManager.Get(player.userID);
-            
+
             int amountToTake = fm.GetPrice(upgradeType);
             string currency = Cfg.UpgradeCurrency[upgradeType];
 
-            if(player.inventory.GetAmount(itemIDMap[currency]) < amountToTake){
-                errorMsg = "You need "+humanNames[currency]+" (x"+amountToTake+") for that!";
-            } 
-            else 
+            if (player.inventory.GetAmount(itemIDMap[currency]) < amountToTake)
             {
-                 if(fm.doUpgrade(upgradeType))
+                errorMsg = "You need " + humanNames[currency] + " (x" + amountToTake + ") for that!";
+            }
+            else
+            {
+                if (fm.doUpgrade(upgradeType))
                 {
                     player.inventory.Take(null, itemIDMap[currency], amountToTake);
                 }
@@ -562,7 +563,7 @@ namespace Oxide.Plugins
             reloadSlotUI(player, slot, errorMsg);
         }
 
-        
+
         [ConsoleCommand("virtualsmelter.addres")]
         private void CmdAddRes(ConsoleSystem.Arg arg)
         {
@@ -626,12 +627,12 @@ namespace Oxide.Plugins
         [ChatCommand("smelt")]
         void SmeltCmd(BasePlayer player, string command, string[] args)
         {
-            if(HasPermission(player.UserIDString, permUse))
+            if (HasPermission(player.UserIDString, permUse))
             {
                 FurnaceManager fm = FurnaceManager.Get(player.userID);
                 _wipeTime = SaveRestore.SaveCreatedTime.ToLocalTime();
                 //Autowipe contents on map wipe, keep levels.
-                if(fm.lastCalculationTime < _wipeTime)
+                if (fm.lastCalculationTime < _wipeTime)
                 {
                     Puts("INFO: wipetime " + _wipeTime + " last access " + fm.lastCalculationTime + " wiping smelter content for " + player);
                     fm.wipeContents();
@@ -684,10 +685,11 @@ namespace Oxide.Plugins
         private class FurnaceManager
         {
             public ulong ownerID;
-            public Dictionary<int,  FurnaceSlot> Slots = new Dictionary<int,  FurnaceSlot>();
+            public Dictionary<int, FurnaceSlot> Slots = new Dictionary<int, FurnaceSlot>();
             public DateTime lastCalculationTime = DateTime.Now;
             public int currentLevel = 0;
-            public Dictionary<string, int> upgradeLevels = new Dictionary<string, int>(){
+            public Dictionary<string, int> upgradeLevels = new Dictionary<string, int>()
+            {
                 ["slots"] = 0,
                 ["speed"] = 0,
                 ["fuel"] = 0,
@@ -703,7 +705,7 @@ namespace Oxide.Plugins
                 ["sulfur"] = Cfg.OutputPerMinute["sulfur"]
             };
 
-             public FurnaceManager(ulong ownerId) : base()
+            public FurnaceManager(ulong ownerId) : base()
             {
                 ownerID = ownerId;
             }
@@ -711,7 +713,7 @@ namespace Oxide.Plugins
             {
                 if (Plugin._furnaceManager.ContainsKey(id))
                     return Plugin._furnaceManager[id];
-                
+
                 var fileName = $"{"VirtualSmelter"}/{id}";
 
                 FurnaceManager manager;
@@ -735,16 +737,18 @@ namespace Oxide.Plugins
 
                 return manager;
             }
-            public int getCapacity(){
-                return currentLevel*Cfg.BaseCapacity;
+            public int getCapacity()
+            {
+                return currentLevel * Cfg.BaseCapacity;
             }
-            public float getEfficiency(){
-                if(upgradeLevels["efficiency"] == 0) return 1f;
+            public float getEfficiency()
+            {
+                if (upgradeLevels["efficiency"] == 0) return 1f;
                 return Cfg.Upgrades["efficiency"][upgradeLevels["efficiency"]]["effect"];
             }
             private void calculateSmeltingPerMinute()
             {
-                int speed = upgradeLevels["speed"] > 0 ? (int) Cfg.Upgrades["speed"][upgradeLevels["speed"]]["effect"] : 1;
+                int speed = upgradeLevels["speed"] > 0 ? (int)Cfg.Upgrades["speed"][upgradeLevels["speed"]]["effect"] : 1;
                 currentSmeltingPerMinute = new Dictionary<string, int>()
                 {
                     ["wood"] = Cfg.OutputPerMinute["wood"] * currentLevel * speed,
@@ -754,29 +758,33 @@ namespace Oxide.Plugins
                 };
                 SaveData();
             }
-            public Dictionary<string, int> getSmeltingPerMinute(){
+            public Dictionary<string, int> getSmeltingPerMinute()
+            {
                 return currentSmeltingPerMinute;
             }
             private void calculateFuelConsumption()
-            {                
-                float fuelEfficiency = upgradeLevels["fuel"] == 0 ? 1f : Cfg.Upgrades["fuel"][upgradeLevels["fuel"]]["effect"];               
-				float speed = upgradeLevels["speed"] > 0 ? (int) Cfg.Upgrades["speed"][upgradeLevels["speed"]]["effect"]*Cfg.SpeedFuelMultiplyer : 1f;
+            {
+                float fuelEfficiency = upgradeLevels["fuel"] == 0 ? 1f : Cfg.Upgrades["fuel"][upgradeLevels["fuel"]]["effect"];
+                float speed = upgradeLevels["speed"] > 0 ? (int)Cfg.Upgrades["speed"][upgradeLevels["speed"]]["effect"] * Cfg.SpeedFuelMultiplyer : 1f;
 
                 fuelEfficiency = fuelEfficiency * speed;
                 currentFuelConsumptionPerMinute = (int)Math.Ceiling(Cfg.FuelPerSlotLevel * currentLevel * fuelEfficiency);
                 SaveData();
             }
 
-            public float getFuelConsumption(){
+            public float getFuelConsumption()
+            {
                 return currentFuelConsumptionPerMinute;
             }
-            public int LevelUpPrice(){
-                return Cfg.BaseLevelPrice + (int)Math.Floor((currentLevel+1)/10f)*(2*(int)Math.Floor((currentLevel+1)/10f));
+            public int LevelUpPrice()
+            {
+                return Cfg.BaseLevelPrice + (int)Math.Floor((currentLevel + 1) / 10f) * (2 * (int)Math.Floor((currentLevel + 1) / 10f));
             }
-            
-            public bool LevelUp(){
-                currentLevel +=1;
-                if(Slots.Count() == 0) AddSlot();
+
+            public bool LevelUp()
+            {
+                currentLevel += 1;
+                if (Slots.Count() == 0) AddSlot();
                 calculateSmeltingPerMinute();
                 calculateFuelConsumption();
                 SaveData();
@@ -784,46 +792,47 @@ namespace Oxide.Plugins
             }
 
             public bool canUpgrade(string type)
-            {    
-                if(!upgradeLevels.ContainsKey(type)) return false;
+            {
+                if (!upgradeLevels.ContainsKey(type)) return false;
                 return upgradeLevels[type] < Cfg.Upgrades[type].Count();
             }
             public int GetPrice(string type)
             {
-                if(type == "level") return LevelUpPrice();
+                if (type == "level") return LevelUpPrice();
 
-                if(!upgradeLevels.ContainsKey(type) || upgradeLevels[type] >= Cfg.Upgrades[type].Count()) return 0;
-                return (int)Math.Floor(Cfg.Upgrades[type][upgradeLevels[type]+1]["price"]);
+                if (!upgradeLevels.ContainsKey(type) || upgradeLevels[type] >= Cfg.Upgrades[type].Count()) return 0;
+                return (int)Math.Floor(Cfg.Upgrades[type][upgradeLevels[type] + 1]["price"]);
             }
 
             public bool doUpgrade(string type)
-            {    
+            {
                 calculateContents(true);
-                if(type == "level") return LevelUp();
+                if (type == "level") return LevelUp();
 
-                if(!upgradeLevels.ContainsKey(type) || upgradeLevels[type] >= Cfg.Upgrades[type].Count()) return false;
-                switch(type)
+                if (!upgradeLevels.ContainsKey(type) || upgradeLevels[type] >= Cfg.Upgrades[type].Count()) return false;
+                switch (type)
                 {
                     case "slots":
                         AddSlot();
-                    break;
+                        break;
                     case "fuel":
                         calculateFuelConsumption();
-                    break;
+                        break;
                     case "speed":
                         calculateFuelConsumption();
                         calculateSmeltingPerMinute();
-                    break;
+                        break;
                     case "efficiency":
                     default:
-                    break;
+                        break;
                 }
                 upgradeLevels[type]++;
                 SaveData();
                 return true;
             }
-            
-            public bool AddSlot(){
+
+            public bool AddSlot()
+            {
                 int currentSlots = Slots.Count();
                 FurnaceSlot slot = new FurnaceSlot(ownerID, currentSlots);
                 Slots.Add(currentSlots, slot);
@@ -835,17 +844,19 @@ namespace Oxide.Plugins
             {
                 FurnaceSlot slot = Slots[slotId];
                 // Smelting res
-                if(res == "empty"){
-                    if(slot.smeltingRes == "empty") return "No Res specified!";
+                if (res == "empty")
+                {
+                    if (slot.smeltingRes == "empty") return "No Res specified!";
                     calculateContents(true);
                     res = slot.smeltingRes;
                 }
                 int playerResAmount = player.inventory.GetAmount(Plugin.itemIDMap[res]);
-                if(playerResAmount == 0) return "Not enough resources!";
-                if(res == "wood") playerResAmount = (int)Math.Floor(0.5f*playerResAmount);
+                if (playerResAmount == 0) return "Not enough resources!";
+                if (res == "wood") playerResAmount = (int)Math.Floor(0.5f * playerResAmount);
                 int addAmount = (int)Math.Floor(getCapacity() - slot.smeltingResAmount);
-                if(addAmount == 0) return "The slot is full!";
-                if(playerResAmount < addAmount){
+                if (addAmount == 0) return "The slot is full!";
+                if (playerResAmount < addAmount)
+                {
                     addAmount = playerResAmount;
                 }
                 slot.AddRes(res, addAmount);
@@ -853,15 +864,17 @@ namespace Oxide.Plugins
 
                 // fuel
                 int fuelNeeded = (int)Math.Ceiling(calculateResFuel(slotId) - slot.currentFuel);
-                if(fuelNeeded > slot.currentFuel){
+                if (fuelNeeded > slot.currentFuel)
+                {
                     playerResAmount = player.inventory.GetAmount(Plugin.itemIDMap["wood"]);
-                    if(playerResAmount < fuelNeeded){
+                    if (playerResAmount < fuelNeeded)
+                    {
                         fuelNeeded = playerResAmount;
                     }
                     Plugin.takeItem(player, "wood", fuelNeeded);
                     slot.currentFuel += fuelNeeded;
                 }
-                
+
                 slot.lastAccessTime = DateTime.Now;
 
                 SaveData();
@@ -871,24 +884,24 @@ namespace Oxide.Plugins
             public float getFuelForHours(int slotId)
             {
                 FurnaceSlot slot = Slots[slotId];
-                if(slot.currentFuel == 0f) return 0f;
+                if (slot.currentFuel == 0f) return 0f;
 
                 return (slot.currentFuel / getFuelConsumption()) / 60;
             }
             public float getSmeltingForHours(int slotId)
             {
                 FurnaceSlot slot = Slots[slotId];
-                if(slot.smeltingRes == "empty") return 0;
+                if (slot.smeltingRes == "empty") return 0;
                 Dictionary<string, int> smelt = getSmeltingPerMinute();
-                float effect = upgradeLevels["efficiency"] > 0 ?  Cfg.Upgrades["efficiency"][upgradeLevels["efficiency"]]["effect"] : 1f;
+                float effect = upgradeLevels["efficiency"] > 0 ? Cfg.Upgrades["efficiency"][upgradeLevels["efficiency"]]["effect"] : 1f;
 
-                return ((slot.smeltingResAmount*effect) / smelt[slot.smeltingRes]) / 60;
+                return ((slot.smeltingResAmount * effect) / smelt[slot.smeltingRes]) / 60;
             }
 
             private int calculateResFuel(int slotId)
             {
-                float hoursToSmelt =  getSmeltingForHours(slotId);
-                int fuelRequired = (int)Math.Ceiling(getFuelConsumption()*hoursToSmelt*60);
+                float hoursToSmelt = getSmeltingForHours(slotId);
+                int fuelRequired = (int)Math.Ceiling(getFuelConsumption() * hoursToSmelt * 60);
 
                 return fuelRequired;
             }
@@ -897,31 +910,31 @@ namespace Oxide.Plugins
             {
                 FurnaceSlot slot = Slots[slotId];
                 calculateContents(true);
-                if(slot.smeltingRes == "empty") return "Slot is empty!";
+                if (slot.smeltingRes == "empty") return "Slot is empty!";
                 // smelting res
                 Item res;
-                if(slot.smeltingResAmount >= 1)
+                if (slot.smeltingResAmount >= 1)
                 {
-                    res = ItemManager.CreateByItemID(Plugin.itemIDMap[slot.smeltingRes], (int) Math.Ceiling(slot.smeltingResAmount), 0UL);
+                    res = ItemManager.CreateByItemID(Plugin.itemIDMap[slot.smeltingRes], (int)Math.Ceiling(slot.smeltingResAmount), 0UL);
                     player.GiveItem(res, BaseEntity.GiveItemReason.PickedUp);
                 }
                 // output res
-                if(slot.productResAmount >= 1)
+                if (slot.productResAmount >= 1)
                 {
-                    res = ItemManager.CreateByItemID(Plugin.itemIDMap[slot.smeltingRes+"_out"], (int) Math.Ceiling(slot.productResAmount), 0UL);
+                    res = ItemManager.CreateByItemID(Plugin.itemIDMap[slot.smeltingRes + "_out"], (int)Math.Ceiling(slot.productResAmount), 0UL);
                     player.GiveItem(res, BaseEntity.GiveItemReason.PickedUp);
                 }
                 // fuel
-                if(slot.currentFuel >= 1f)
+                if (slot.currentFuel >= 1f)
                 {
-                    res = ItemManager.CreateByItemID(Plugin.itemIDMap["wood"], (int) Math.Ceiling(slot.currentFuel), 0UL);
+                    res = ItemManager.CreateByItemID(Plugin.itemIDMap["wood"], (int)Math.Ceiling(slot.currentFuel), 0UL);
                     player.GiveItem(res, BaseEntity.GiveItemReason.PickedUp);
 
                 }
                 // biproduct
-                if(slot.biproductResAmount >= 1)
+                if (slot.biproductResAmount >= 1)
                 {
-                    res = ItemManager.CreateByItemID(Plugin.itemIDMap["charcoal"], (int) Math.Ceiling(slot.biproductResAmount), 0UL);
+                    res = ItemManager.CreateByItemID(Plugin.itemIDMap["charcoal"], (int)Math.Ceiling(slot.biproductResAmount), 0UL);
                     player.GiveItem(res, BaseEntity.GiveItemReason.PickedUp);
                 }
 
@@ -930,14 +943,14 @@ namespace Oxide.Plugins
                 return VirtualSmelter.globalNoErrorString;
             }
 
-            
+
             public string AddFuel(BasePlayer player, int slotId, int percent)
             {
                 FurnaceSlot slot = Slots[slotId];
                 calculateContents(true);
                 int playerResAmount = player.inventory.GetAmount(Plugin.itemIDMap["wood"]);
-                if(playerResAmount == 0) return "You have no wood!";
-                int fuelPlaced = (playerResAmount == 1) ? 1 : (int)Math.Floor((playerResAmount / 100f) * percent);                
+                if (playerResAmount == 0) return "You have no wood!";
+                int fuelPlaced = (playerResAmount == 1) ? 1 : (int)Math.Floor((playerResAmount / 100f) * percent);
                 Plugin.takeItem(player, "wood", fuelPlaced);
                 slot.currentFuel += fuelPlaced;
                 slot.lastAccessTime = DateTime.Now;
@@ -945,70 +958,74 @@ namespace Oxide.Plugins
                 return VirtualSmelter.globalNoErrorString;
             }
 
-            public void wipeContents(){
-                foreach(KeyValuePair<int,FurnaceSlot> slotKV in Slots){
+            public void wipeContents()
+            {
+                foreach (KeyValuePair<int, FurnaceSlot> slotKV in Slots)
+                {
                     FurnaceSlot slot = slotKV.Value;
                     slot.Empty();
                 }
                 lastCalculationTime = DateTime.Now;
                 SaveData();
             }
-            public void calculateContents(bool force = false){
-                if(force == false && ((float)((DateTime.Now - lastCalculationTime).TotalSeconds) < 1.5f)) return;
+            public void calculateContents(bool force = false)
+            {
+                if (force == false && ((float)((DateTime.Now - lastCalculationTime).TotalSeconds) < 1.5f)) return;
 
-                float fuelPerSecond = getFuelConsumption()/60f;
+                float fuelPerSecond = getFuelConsumption() / 60f;
                 Dictionary<string, int> smeltPerMinute = getSmeltingPerMinute();
                 float efficiency = getEfficiency();
-                
-                foreach(KeyValuePair<int,FurnaceSlot> slotKV in Slots){
-                    FurnaceSlot slot = slotKV.Value;
-                    if(!slot.HasRes()) continue;
 
-                    if(slot.IsSmelting())
+                foreach (KeyValuePair<int, FurnaceSlot> slotKV in Slots)
+                {
+                    FurnaceSlot slot = slotKV.Value;
+                    if (!slot.HasRes()) continue;
+
+                    if (slot.IsSmelting())
                     {
                         float sinceUpdate = slot.SecondsSinceUpdate();
 
                         string res = slot.smeltingRes;
-                        float usedFuel = fuelPerSecond*sinceUpdate;
-                        if(usedFuel >= slot.currentFuel) usedFuel = slot.currentFuel;
+                        float usedFuel = fuelPerSecond * sinceUpdate;
+                        if (usedFuel >= slot.currentFuel) usedFuel = slot.currentFuel;
                         slot.currentFuel = slot.currentFuel - usedFuel;
                         slot.biproductResAmount = slot.biproductResAmount + usedFuel;
                         //correct seconds if fuel ran out mid-smelting!
-                        sinceUpdate = usedFuel/fuelPerSecond;
+                        sinceUpdate = usedFuel / fuelPerSecond;
 
-                        float usedRes = ((smeltPerMinute[res]*(1/efficiency))/60)*sinceUpdate;
-                        if(usedRes >= slot.smeltingResAmount) usedRes = slot.smeltingResAmount;
+                        float usedRes = ((smeltPerMinute[res] * (1 / efficiency)) / 60) * sinceUpdate;
+                        if (usedRes >= slot.smeltingResAmount) usedRes = slot.smeltingResAmount;
                         slot.smeltingResAmount = slot.smeltingResAmount - usedRes;
-                        
-                        float productSmolten = (smeltPerMinute[res]/60f)*sinceUpdate;
-                        if(productSmolten >= (usedRes*efficiency)) productSmolten = (usedRes*efficiency);
+
+                        float productSmolten = (smeltPerMinute[res] / 60f) * sinceUpdate;
+                        if (productSmolten >= (usedRes * efficiency)) productSmolten = (usedRes * efficiency);
                         slot.productResAmount = slot.productResAmount + productSmolten;
-                        
+
                         slot.lastAccessTime = DateTime.Now;
-                    } 
-                    else if(slot.HasFuel())
+                    }
+                    else if (slot.HasFuel())
                     {
                         float sinceUpdate = slot.SecondsSinceUpdate();
-                        float usedFuel = fuelPerSecond*sinceUpdate;
-                        if(usedFuel >= slot.currentFuel) usedFuel = slot.currentFuel;
+                        float usedFuel = fuelPerSecond * sinceUpdate;
+                        if (usedFuel >= slot.currentFuel) usedFuel = slot.currentFuel;
                         slot.currentFuel = slot.currentFuel - usedFuel;
                         slot.biproductResAmount = slot.biproductResAmount + usedFuel;
 
                         slot.lastAccessTime = DateTime.Now;
-                    }                    
+                    }
                 }
                 lastCalculationTime = DateTime.Now;
                 SaveData();
             }
 
-    
+
             public void SaveData()
             {
                 VirtualSmelter.SaveData(this, $"{"VirtualSmelter"}/{ownerID}");
             }
         }
 
-        
+
 
         private class FurnaceSlot
         {
@@ -1022,7 +1039,7 @@ namespace Oxide.Plugins
             public float biproductResAmount = 0.0f;
             public float currentFuel = 0.0f;
 
-            public  FurnaceSlot(ulong oId, int eID) : base()
+            public FurnaceSlot(ulong oId, int eID) : base()
             {
                 ownerId = oId;
                 entityId = eID;
@@ -1048,7 +1065,8 @@ namespace Oxide.Plugins
                 smeltingResAmount += amount;
                 lastAccessTime = DateTime.Now;
             }
-            public float SecondsSinceUpdate(){
+            public float SecondsSinceUpdate()
+            {
                 return (float)((DateTime.Now - lastAccessTime).TotalSeconds);
             }
             public void Empty()
@@ -1072,64 +1090,71 @@ namespace Oxide.Plugins
             player.inventory.Take(null, itemIDMap[res], amount);
             player.Command("note.inv", itemIDMap[res], -amount);
         }
-        
-        private void reloadControlUI(BasePlayer player, string errorMsg = globalNoErrorString){
-            if(!UiPlayers.Contains(player)){
+
+        private void reloadControlUI(BasePlayer player, string errorMsg = globalNoErrorString)
+        {
+            if (!UiPlayers.Contains(player))
+            {
                 return;
             }
-            
+
             upsertPlayerTimerRuntime(player);
             CuiHelper.DestroyUi(player, "VirtualSmelter_control");
-         
+
             FurnaceManager fm = FurnaceManager.Get(player.userID);
             CuiHelper.DestroyUi(player, "VirtualSmelter_head");
             GUIHeaderElement(player, "VirtualSmelter_head", fm, errorMsg);
             GUIControlElement(player, "VirtualSmelter_control", fm);
         }
-        private void reloadSlotUI(BasePlayer player, int slotId, string errorMsg = globalNoErrorString){
-            if(!UiPlayers.Contains(player)){
+        private void reloadSlotUI(BasePlayer player, int slotId, string errorMsg = globalNoErrorString)
+        {
+            if (!UiPlayers.Contains(player))
+            {
                 return;
             }
-            
+
             upsertPlayerTimerRuntime(player);
             FurnaceManager fm = FurnaceManager.Get(player.userID);
             CuiHelper.DestroyUi(player, "VirtualSmelter_head");
             GUIHeaderElement(player, "VirtualSmelter_head", fm, errorMsg);
-            CuiHelper.DestroyUi(player, "VirtualSmelter_slot_"+slotId);
-            GUISlotElement(player, "VirtualSmelter_slot_"+slotId, slotId, fm, fm.Slots[slotId]);
-            CuiHelper.DestroyUi(player, "VirtualSmelter_slot_"+slotId+"_numbers");
-            GUISlotNumbersElement(player, "VirtualSmelter_slot_"+slotId+"_numbers", slotId, fm, fm.Slots[slotId]);
+            CuiHelper.DestroyUi(player, "VirtualSmelter_slot_" + slotId);
+            GUISlotElement(player, "VirtualSmelter_slot_" + slotId, slotId, fm, fm.Slots[slotId]);
+            CuiHelper.DestroyUi(player, "VirtualSmelter_slot_" + slotId + "_numbers");
+            GUISlotNumbersElement(player, "VirtualSmelter_slot_" + slotId + "_numbers", slotId, fm, fm.Slots[slotId]);
         }
-        private void reloadUI(BasePlayer player, string errorMsg = globalNoErrorString){
-            if(!UiPlayers.Contains(player)){
+        private void reloadUI(BasePlayer player, string errorMsg = globalNoErrorString)
+        {
+            if (!UiPlayers.Contains(player))
+            {
                 UiPlayers.Add(player);
             }
-            foreach(string ui in uiElements)
+            foreach (string ui in uiElements)
             {
                 CuiHelper.DestroyUi(player, ui);
             }
-            
+
             FurnaceManager fm = FurnaceManager.Get(player.userID);
             displayUI(player, fm, errorMsg);
             Timer resTimer = timer.Every(2f, () =>
             {
-                float timeSinceOpening = (float)(DateTime.Now -  playerTimerRuntime[player.userID]).TotalSeconds;
-                if(Cfg.UiAutoCloseSeconds != 0f && timeSinceOpening > Cfg.UiAutoCloseSeconds)
+                float timeSinceOpening = (float)(DateTime.Now - playerTimerRuntime[player.userID]).TotalSeconds;
+                if (Cfg.UiAutoCloseSeconds != 0f && timeSinceOpening > Cfg.UiAutoCloseSeconds)
                 {
                     killUI(player);
                     return;
                 }
 
-                foreach(KeyValuePair<int, FurnaceSlot> slotKV in fm.Slots)
+                foreach (KeyValuePair<int, FurnaceSlot> slotKV in fm.Slots)
                 {
-                    if(slotKV.Value.IsSmelting() || slotKV.Value.HasFuel())
-                    {   
-                        CuiHelper.DestroyUi(player, "VirtualSmelter_slot_"+slotKV.Key+"_numbers");
-                        GUISlotNumbersElement(player, "VirtualSmelter_slot_"+slotKV.Key+"_numbers", slotKV.Key, fm, fm.Slots[slotKV.Key]);
+                    if (slotKV.Value.IsSmelting() || slotKV.Value.HasFuel())
+                    {
+                        CuiHelper.DestroyUi(player, "VirtualSmelter_slot_" + slotKV.Key + "_numbers");
+                        GUISlotNumbersElement(player, "VirtualSmelter_slot_" + slotKV.Key + "_numbers", slotKV.Key, fm, fm.Slots[slotKV.Key]);
                     }
                 }
             });
-            if(playerTimer.ContainsKey(player.userID)){
+            if (playerTimer.ContainsKey(player.userID))
+            {
                 playerTimer[player.userID].Destroy();
                 playerTimer[player.userID] = resTimer;
             }
@@ -1140,15 +1165,18 @@ namespace Oxide.Plugins
             upsertPlayerTimerRuntime(player);
 
         }
-        private void killUI(BasePlayer player){
-            if(UiPlayers.Contains(player)){
+        private void killUI(BasePlayer player)
+        {
+            if (UiPlayers.Contains(player))
+            {
                 UiPlayers.Remove(player);
-                foreach(string ui in uiElements)
+                foreach (string ui in uiElements)
                 {
                     CuiHelper.DestroyUi(player, ui);
                 }
             }
-            if(playerTimer.ContainsKey(player.userID)){
+            if (playerTimer.ContainsKey(player.userID))
+            {
                 playerTimer[player.userID].Destroy();
                 playerTimer.Remove(player.userID);
                 playerTimerRuntime.Remove(player.userID);
@@ -1157,7 +1185,8 @@ namespace Oxide.Plugins
 
         private void upsertPlayerTimerRuntime(BasePlayer player)
         {
-            if(playerTimerRuntime.ContainsKey(player.userID)){
+            if (playerTimerRuntime.ContainsKey(player.userID))
+            {
                 playerTimerRuntime[player.userID] = DateTime.Now;
             }
             else
@@ -1166,7 +1195,8 @@ namespace Oxide.Plugins
             }
         }
 
-        private string numberCandy(int number){
+        private string numberCandy(int number)
+        {
             return Convert.ToDecimal(number).ToString("N", nfi);
         }
 
@@ -1185,7 +1215,7 @@ namespace Oxide.Plugins
                 CuiHelper.DestroyUi(player, ui);
             }
             var mainName = "VirtualSmelter";
-            GUIInfoElement(player, mainName +"_furnace_info");
+            GUIInfoElement(player, mainName + "_furnace_info");
 
         }
 
@@ -1202,14 +1232,14 @@ namespace Oxide.Plugins
         private void displayUI(BasePlayer player, FurnaceManager fm, string errorMsg = globalNoErrorString)
         {
             var mainName = "VirtualSmelter";
-            GUIHeaderElement(player, mainName+"_head", fm, errorMsg);
-            GUIControlElement(player, mainName+"_control", fm);
-            GUIFooterElement(player, mainName+"_foot", fm);
-            
-            foreach(KeyValuePair<int, FurnaceSlot> slot in fm.Slots)
+            GUIHeaderElement(player, mainName + "_head", fm, errorMsg);
+            GUIControlElement(player, mainName + "_control", fm);
+            GUIFooterElement(player, mainName + "_foot", fm);
+
+            foreach (KeyValuePair<int, FurnaceSlot> slot in fm.Slots)
             {
-                GUISlotElement(player, mainName+"_slot_"+slot.Key, slot.Key, fm, slot.Value);
-                GUISlotNumbersElement(player, mainName+"_slot_"+slot.Key+"_numbers", slot.Key, fm, slot.Value);
+                GUISlotElement(player, mainName + "_slot_" + slot.Key, slot.Key, fm, slot.Value);
+                GUISlotNumbersElement(player, mainName + "_slot_" + slot.Key + "_numbers", slot.Key, fm, slot.Value);
             }
 
 
@@ -1249,19 +1279,19 @@ namespace Oxide.Plugins
                 }
             }, elUiId);
 
-           
+
 
             CuiHelper.AddUi(player, elements);
         }
 
-        private void GUIHeaderElement(BasePlayer player, string elUiId, FurnaceManager fm, string errorMsg  = globalNoErrorString)
+        private void GUIHeaderElement(BasePlayer player, string elUiId, FurnaceManager fm, string errorMsg = globalNoErrorString)
         {
             var elements = new CuiElementContainer();
             elements.Add(new CuiPanel
             {
                 Image =
                 {
-                    Color = "0 0 0 0.5", 
+                    Color = "0 0 0 0.5",
                     Material = "assets/content/ui/uibackgroundblur-ingamemenu.mat"
                 },
                 RectTransform =
@@ -1304,7 +1334,7 @@ namespace Oxide.Plugins
                 }
             }, elUiId);
 
-            if(errorMsg != "none")
+            if (errorMsg != "none")
             {
                 elements.Add(new CuiLabel
                 {
@@ -1325,16 +1355,16 @@ namespace Oxide.Plugins
 
             CuiHelper.AddUi(player, elements);
         }
-        
+
         private void GUIControlElement(BasePlayer player, string elUiId, FurnaceManager fm)
         {
-            
+
             var elements = new CuiElementContainer();
             elements.Add(new CuiPanel
             {
                 Image =
                 {
-                    Color = "0 0 0 0.5", 
+                    Color = "0 0 0 0.5",
                     Material = "assets/content/ui/uibackgroundblur-ingamemenu.mat"
                 },
                 RectTransform =
@@ -1368,7 +1398,7 @@ namespace Oxide.Plugins
                     AnchorMax = leftWidth + " "+ contentStart
                 }
             }, elUiId);
-            contentStart = contentStart-1.1f*buttonHeight;
+            contentStart = contentStart - 1.1f * buttonHeight;
             elements.Add(new CuiLabel
             {
                 Text =
@@ -1399,8 +1429,8 @@ namespace Oxide.Plugins
                     AnchorMax = leftWidth + " "+ contentStart
                 }
             }, elUiId);
-            
-            contentStart = contentStart-buttonHeight;
+
+            contentStart = contentStart - buttonHeight;
             elements.Add(new CuiLabel
             {
                 Text =
@@ -1432,7 +1462,7 @@ namespace Oxide.Plugins
                 }
             }, elUiId);
 
-            contentStart = contentStart-buttonHeight;
+            contentStart = contentStart - buttonHeight;
             elements.Add(new CuiLabel
             {
                 Text =
@@ -1464,8 +1494,8 @@ namespace Oxide.Plugins
                 }
             }, elUiId);
 
-            
-            contentStart = contentStart-buttonHeight;
+
+            contentStart = contentStart - buttonHeight;
             elements.Add(new CuiLabel
             {
                 Text =
@@ -1482,9 +1512,9 @@ namespace Oxide.Plugins
                 }
             }, elUiId);
             Dictionary<string, int> smelt = fm.getSmeltingPerMinute();
-            foreach(string res in Cfg.AvailableRes)
+            foreach (string res in Cfg.AvailableRes)
             {
-                contentStart = contentStart-buttonHeight;
+                contentStart = contentStart - buttonHeight;
                 elements.Add(new CuiLabel
                 {
                     Text =
@@ -1516,9 +1546,9 @@ namespace Oxide.Plugins
                     }
                 }, elUiId);
             }
-            
-            
-            contentStart = contentStart-1.2f*buttonHeight;
+
+
+            contentStart = contentStart - 1.2f * buttonHeight;
 
             elements.Add(new CuiLabel
             {
@@ -1536,7 +1566,7 @@ namespace Oxide.Plugins
                 }
             }, elUiId);
 
-            contentStart = contentStart-1.2f*buttonHeight;
+            contentStart = contentStart - 1.2f * buttonHeight;
             elements.Add(new CuiLabel
             {
                 Text =
@@ -1552,8 +1582,8 @@ namespace Oxide.Plugins
                     AnchorMax = leftWidth + " "+ contentStart
                 }
             }, elUiId);
-            contentStart = contentStart-buttonHeight;
-            if(fm.currentLevel >= Cfg.MaxLevel)
+            contentStart = contentStart - buttonHeight;
+            if (fm.currentLevel >= Cfg.MaxLevel)
             {
                 elements.Add(new CuiLabel
                 {
@@ -1610,14 +1640,14 @@ namespace Oxide.Plugins
                 }, elUiId);
             }
 
-            
-            if(fm.currentLevel > 0)
+
+            if (fm.currentLevel > 0)
             {
-                foreach(string upgradeType in Cfg.AvailableUpgrades)
+                foreach (string upgradeType in Cfg.AvailableUpgrades)
                 {
-                    
+
                     int currentLevel = fm.upgradeLevels[upgradeType];
-                    contentStart = contentStart-1.5f*buttonHeight;
+                    contentStart = contentStart - 1.5f * buttonHeight;
                     elements.Add(new CuiLabel
                     {
                         Text =
@@ -1633,13 +1663,13 @@ namespace Oxide.Plugins
                             AnchorMax = leftWidth + " "+ contentStart
                         }
                     }, elUiId);
-                    contentStart = contentStart-buttonHeight-space;
+                    contentStart = contentStart - buttonHeight - space;
 
-                    float effect = currentLevel < Cfg.Upgrades[upgradeType].Count() ?  Cfg.Upgrades[upgradeType][currentLevel+1]["effect"] : Cfg.Upgrades[upgradeType][currentLevel]["effect"] ;
-                    
-                    if(!fm.canUpgrade(upgradeType))
+                    float effect = currentLevel < Cfg.Upgrades[upgradeType].Count() ? Cfg.Upgrades[upgradeType][currentLevel + 1]["effect"] : Cfg.Upgrades[upgradeType][currentLevel]["effect"];
+
+                    if (!fm.canUpgrade(upgradeType))
                     {
-                        
+
                         elements.Add(new CuiLabel
                         {
                             Text =
@@ -1700,16 +1730,16 @@ namespace Oxide.Plugins
 
             CuiHelper.AddUi(player, elements);
         }
-        
+
         private void GUIFooterElement(BasePlayer player, string elUiId, FurnaceManager fm)
         {
-            
+
             var elements = new CuiElementContainer();
             elements.Add(new CuiPanel
             {
                 Image =
                 {
-                    Color = "0 0 0 0.5", 
+                    Color = "0 0 0 0.5",
                     Material = "assets/content/ui/uibackgroundblur-ingamemenu.mat"
                 },
                 RectTransform =
@@ -1741,17 +1771,17 @@ namespace Oxide.Plugins
                 }
             };
             elements.Add(closeButton, elUiId);
-            
+
             CuiHelper.AddUi(player, elements);
         }
-        
+
         private void GUISlotElement(BasePlayer player, string elUiId, int slotId, FurnaceManager fm, FurnaceSlot slot)
         {
-            
+
             var elements = new CuiElementContainer();
-            float topBoundary = globalTopBoundary - eHeadHeight - globalSpace - (slotId*eSlotHeight);
-            if(slotId > 0) topBoundary -= 0.5f*globalSpace;
-            float botBoundary = globalTopBoundary - eHeadHeight - globalSpace - ((slotId+1)*eSlotHeight);
+            float topBoundary = globalTopBoundary - eHeadHeight - globalSpace - (slotId * eSlotHeight);
+            if (slotId > 0) topBoundary -= 0.5f * globalSpace;
+            float botBoundary = globalTopBoundary - eHeadHeight - globalSpace - ((slotId + 1) * eSlotHeight);
 
             float leftOffset = 0.05f;
             float imageWidth = 0.105f;
@@ -1765,7 +1795,7 @@ namespace Oxide.Plugins
             {
                 Image =
                 {
-                    Color = "0 0 0 0.5", 
+                    Color = "0 0 0 0.5",
                     Material = "assets/content/ui/uibackgroundblur-ingamemenu.mat"
                 },
                 RectTransform =
@@ -1776,20 +1806,20 @@ namespace Oxide.Plugins
                 CursorEnabled = true
             }, "Hud", elUiId);
 
-                // Images
-                elements.Add(new CuiElement
-                {
-                    Name = CuiHelper.GetGuid(),
-                    Parent = elUiId,
-                    Components =
+            // Images
+            elements.Add(new CuiElement
+            {
+                Name = CuiHelper.GetGuid(),
+                Parent = elUiId,
+                Components =
                     {
-                        new CuiRawImageComponent {Png = GetImage(prefabNames["furnace"]) },
+                        new CuiImageComponent { ItemId = ItemManager.itemDictionaryByName["furnace.large"].itemid },
                         new CuiRectTransformComponent {
                             AnchorMin = "0 "+ (10f*globalSpace),
                             AnchorMax = (imageWidth) +" " + (1 - imageHeight + 5f*globalSpace)
                         }
                     }
-                });
+            });
             elements.Add(new CuiLabel
             {
                 Text =
@@ -1808,10 +1838,10 @@ namespace Oxide.Plugins
 
 
             //empty smelter ui
-            if(!slot.HasRes())
+            if (!slot.HasRes())
             {
                 leftOffset = leftOffset + resImageWidth + globalSpace;
-                foreach(string res in Cfg.AvailableRes)
+                foreach (string res in Cfg.AvailableRes)
                 {
                     elements.Add(new CuiElement
                     {
@@ -1819,16 +1849,16 @@ namespace Oxide.Plugins
                         Parent = elUiId,
                         Components =
                         {
-                            new CuiRawImageComponent {Png = GetImage(prefabNames[res]) },
+                            new CuiImageComponent { ItemId = ItemManager.itemDictionaryByName[prefabNames[res]].itemid },
                             new CuiRectTransformComponent {
                             AnchorMin = leftOffset + " " + bottomOffset,
                             AnchorMax = (leftOffset + resImageWidth) +" " + (resImageHeight +bottomOffset)
                             }
                         }
                     });
-                    
+
                     leftOffset = leftOffset + resImageWidth + globalSpace;
-                    
+
                     elements.Add(new CuiLabel
                     {
                         Text =
@@ -1844,7 +1874,7 @@ namespace Oxide.Plugins
                                 AnchorMax = (leftOffset+detailsWidth) +" " + (resImageHeight +bottomOffset)
                         }
                     }, elUiId);
-                    
+
                     elements.Add(new CuiButton
                     {
                         Button =
@@ -1865,8 +1895,8 @@ namespace Oxide.Plugins
                             Color = "1 1 1 1"
                         }
                     }, elUiId);
-                    
-                    leftOffset = leftOffset + detailsWidth +globalSpace;
+
+                    leftOffset = leftOffset + detailsWidth + globalSpace;
                 }
             }
             // filled smelter UI
@@ -1874,12 +1904,12 @@ namespace Oxide.Plugins
             {
                 fm.calculateContents();
                 var ts = TimeSpan.FromHours(fm.getFuelForHours(slot.entityId));
-                string fuelText = " "+ts.Hours+"h "+ ts.Minutes +"min "+ ts.Seconds +"s of fuel";
-                if(ts.Days != 0) fuelText = " "+ts.Days+"d" + fuelText;
+                string fuelText = " " + ts.Hours + "h " + ts.Minutes + "min " + ts.Seconds + "s of fuel";
+                if (ts.Days != 0) fuelText = " " + ts.Days + "d" + fuelText;
                 ts = TimeSpan.FromHours(fm.getSmeltingForHours(slot.entityId));
-                string smeltText = " "+ts.Hours+"h "+ ts.Minutes +"min "+ ts.Seconds +"s to smelt";
-                if(ts.Days != 0) smeltText = " "+ts.Days+"d" + smeltText;
-                
+                string smeltText = " " + ts.Hours + "h " + ts.Minutes + "min " + ts.Seconds + "s to smelt";
+                if (ts.Days != 0) smeltText = " " + ts.Days + "d" + smeltText;
+
                 leftOffset = leftOffset + resImageWidth + globalSpace;
                 // Images
                 elements.Add(new CuiElement
@@ -1888,57 +1918,57 @@ namespace Oxide.Plugins
                     Parent = elUiId,
                     Components =
                     {
-                        new CuiRawImageComponent {Png = GetImage(prefabNames[slot.smeltingRes]) },
+                        new CuiImageComponent { ItemId = ItemManager.itemDictionaryByName[prefabNames[slot.smeltingRes]].itemid },
                         new CuiRectTransformComponent {
                             AnchorMin = leftOffset + " " + 2f*bottomOffset,
                             AnchorMax = (leftOffset + resImageWidth) +" " +  (2f*bottomOffset+resImageHeight)
                         }
                     }
                 });
-                leftOffset = leftOffset + detailsWidth +globalSpace;
-                
+                leftOffset = leftOffset + detailsWidth + globalSpace;
+
                 elements.Add(new CuiElement
                 {
                     Name = CuiHelper.GetGuid(),
                     Parent = elUiId,
                     Components =
                     {
-                        new CuiRawImageComponent {Png = GetImage(prefabNames[slot.smeltingRes+"_out"]) },
+                        new CuiImageComponent { ItemId = ItemManager.itemDictionaryByName[prefabNames[slot.smeltingRes+"_out"]].itemid },
                         new CuiRectTransformComponent {
                             AnchorMin = leftOffset + " " + 2f*bottomOffset,
                             AnchorMax = (leftOffset + resImageWidth) +" " + (2f*bottomOffset+resImageHeight)
                         }
                     }
                 });
-                leftOffset = leftOffset + detailsWidth +globalSpace;
+                leftOffset = leftOffset + detailsWidth + globalSpace;
                 elements.Add(new CuiElement
                 {
                     Name = CuiHelper.GetGuid(),
                     Parent = elUiId,
                     Components =
                     {
-                        new CuiRawImageComponent {Png = GetImage(prefabNames["wood"]) },
+                        new CuiImageComponent { ItemId = ItemManager.itemDictionaryByName[prefabNames["wood"]].itemid },
                         new CuiRectTransformComponent {
                             AnchorMin = leftOffset + " " + 2f*bottomOffset,
                             AnchorMax = (leftOffset + resImageWidth) +" " +  (2f*bottomOffset+resImageHeight)
                         }
                     }
                 });
-                leftOffset = leftOffset + detailsWidth +globalSpace;
+                leftOffset = leftOffset + detailsWidth + globalSpace;
                 elements.Add(new CuiElement
                 {
                     Name = CuiHelper.GetGuid(),
                     Parent = elUiId,
                     Components =
                     {
-                        new CuiRawImageComponent {Png = GetImage(prefabNames["charcoal"]) },
+                        new CuiImageComponent { ItemId = ItemManager.itemDictionaryByName[prefabNames["charcoal"]].itemid },
                         new CuiRectTransformComponent {
                             AnchorMin = leftOffset + " " + 2f*bottomOffset,
                             AnchorMax = (leftOffset + resImageWidth) +" " +  (2f*bottomOffset+resImageHeight)
                         }
                     }
                 });
-                leftOffset = leftOffset + detailsWidth +globalSpace;
+                leftOffset = leftOffset + detailsWidth + globalSpace;
                 elements.Add(new CuiButton
                 {
                     Button =
@@ -1959,7 +1989,7 @@ namespace Oxide.Plugins
                         Color = "1 1 1 1"
                     }
                 }, elUiId);
-                leftOffset = leftOffset + detailsWidth +globalSpace;
+                leftOffset = leftOffset + detailsWidth + globalSpace;
                 elements.Add(new CuiButton
                 {
                     Button =
@@ -2000,7 +2030,7 @@ namespace Oxide.Plugins
                         Color = "1 1 1 1"
                     }
                 }, elUiId);
-                leftOffset = leftOffset + detailsWidth +globalSpace;
+                leftOffset = leftOffset + detailsWidth + globalSpace;
                 elements.Add(new CuiButton
                 {
                     Button =
@@ -2024,23 +2054,23 @@ namespace Oxide.Plugins
             }
 
             CuiHelper.AddUi(player, elements);
-            
+
         }
 
         private void GUISlotNumbersElement(BasePlayer player, string elUiId, int slotId, FurnaceManager fm, FurnaceSlot slot)
         {
-            
+
             var elements = new CuiElementContainer();
-            float topBoundary = globalTopBoundary - eHeadHeight - globalSpace - (slotId*eSlotHeight);
-            if(slotId > 0) topBoundary -= 0.5f*globalSpace;
-            float botBoundary = globalTopBoundary - eHeadHeight - globalSpace - ((slotId+1)*eSlotHeight);
+            float topBoundary = globalTopBoundary - eHeadHeight - globalSpace - (slotId * eSlotHeight);
+            if (slotId > 0) topBoundary -= 0.5f * globalSpace;
+            float botBoundary = globalTopBoundary - eHeadHeight - globalSpace - ((slotId + 1) * eSlotHeight);
 
             float leftOffset = 0f;
             float contentWidth = 0.29f;
             float furnaceImageWidth = 0.08f;
             float detailsWidth = 0.25f;
 
-            if(slot.HasRes())
+            if (slot.HasRes())
             {
                 elements.Add(new CuiPanel
                 {
@@ -2059,16 +2089,16 @@ namespace Oxide.Plugins
                 fm.calculateContents();
 
                 var ts = TimeSpan.FromHours(fm.getFuelForHours(slot.entityId));
-                string fuelText = " "+ts.Hours+":"+ ts.Minutes +":"+ ts.Seconds +" of fuel";
-                if(ts.Days != 0) fuelText = " "+ts.Days+"d" + fuelText;
+                string fuelText = " " + ts.Hours + ":" + ts.Minutes + ":" + ts.Seconds + " of fuel";
+                if (ts.Days != 0) fuelText = " " + ts.Days + "d" + fuelText;
                 ts = TimeSpan.FromHours(fm.getSmeltingForHours(slot.entityId));
-                string smeltText = " "+ts.Hours+":"+ ts.Minutes +":"+ ts.Seconds +" to smelt";
-                if(ts.Days != 0) smeltText = " "+ts.Days+"d" + smeltText;
-                string resAmount = numberCandy((int) Math.Ceiling(slot.smeltingResAmount));
-                string currentFuel = numberCandy((int) Math.Ceiling(slot.currentFuel));
-                string prodAmount = numberCandy((int) Math.Ceiling(slot.productResAmount));
-                string biprodAmount = numberCandy((int) Math.Ceiling(slot.biproductResAmount));
-                
+                string smeltText = " " + ts.Hours + ":" + ts.Minutes + ":" + ts.Seconds + " to smelt";
+                if (ts.Days != 0) smeltText = " " + ts.Days + "d" + smeltText;
+                string resAmount = numberCandy((int)Math.Ceiling(slot.smeltingResAmount));
+                string currentFuel = numberCandy((int)Math.Ceiling(slot.currentFuel));
+                string prodAmount = numberCandy((int)Math.Ceiling(slot.productResAmount));
+                string biprodAmount = numberCandy((int)Math.Ceiling(slot.biproductResAmount));
+
                 string resColor = (resAmount == "0") ? "1 0 0 1" : "1 1 1 1";
                 elements.Add(new CuiLabel
                 {
@@ -2085,7 +2115,7 @@ namespace Oxide.Plugins
                         AnchorMax = (leftOffset+detailsWidth) +" 1"
                     }
                 }, elUiId);
-                leftOffset = leftOffset + detailsWidth +globalSpace;
+                leftOffset = leftOffset + detailsWidth + globalSpace;
                 elements.Add(new CuiLabel
                 {
                     Text =
@@ -2101,7 +2131,7 @@ namespace Oxide.Plugins
                         AnchorMax = (leftOffset+detailsWidth) +" 1"
                     }
                 }, elUiId);
-                leftOffset = leftOffset + detailsWidth +globalSpace;
+                leftOffset = leftOffset + detailsWidth + globalSpace;
                 string fuelColor = (currentFuel == "0") ? "1 0 0 1" : "1 1 1 1";
                 elements.Add(new CuiLabel
                 {
@@ -2118,7 +2148,7 @@ namespace Oxide.Plugins
                         AnchorMax = (leftOffset+detailsWidth) +" 1"
                     }
                 }, elUiId);
-                leftOffset = leftOffset + detailsWidth +globalSpace;
+                leftOffset = leftOffset + detailsWidth + globalSpace;
                 elements.Add(new CuiLabel
                 {
                     Text =
@@ -2135,20 +2165,13 @@ namespace Oxide.Plugins
                     }
                 }, elUiId);
 
-            CuiHelper.AddUi(player, elements);
+                CuiHelper.AddUi(player, elements);
             }
-            
-            
+
+
         }
 
         #endregion
 
-        private string GetImage(string fileName, ulong skin = 0)
-        {
-            string imageId = (string)ImageLibrary.Call("GetImage", fileName, skin);
-            if (!string.IsNullOrEmpty(imageId))
-                return imageId;
-            return string.Empty;
-        }
     }
-}   
+}

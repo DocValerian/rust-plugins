@@ -35,7 +35,6 @@ whilst still doing shorter normal wipes.
 ---
 
 ## Dependencies
-- [ImageLibrary](https://umod.org/plugins/image-library)
 - [ServerRewards](https://umod.org/plugins/server-rewards)
 
 ## Permissions

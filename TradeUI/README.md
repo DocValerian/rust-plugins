@@ -19,7 +19,7 @@ This allows players to have full market price transparency and instantly buy fro
 ---
 
 ## Dependencies
-- ImageLibrary
+- NONE
 
 ## Permissions
 ```

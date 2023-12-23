@@ -30,14 +30,14 @@ using Newtonsoft.Json;
 
 namespace Oxide.Plugins
 {
-    [Info("TimedRewards", "DocValerian", "1.2.0")]
+    [Info("TimedRewards", "DocValerian", "1.2.5")]
     class TimedRewards : RustPlugin
     {
         static TimedRewards Plugin;
-        
+
         [PluginReference]
-        private Plugin ImageLibrary, PlaytimeTracker;
-        
+        private Plugin PlaytimeTracker, ZNExperience;
+
         const string permUse = "timedrewards.use";
         bool HasPermission(string id, string perm) => permission.UserHasPermission(id, perm);
 
@@ -78,7 +78,7 @@ namespace Oxide.Plugins
         }
 
         static ConfigFile Cfg = new ConfigFile();
-        class ConfigFile 
+        class ConfigFile
         {
             [JsonProperty(PropertyName = "Reward Item:amount per minute playtime (max 6)")]
             public Dictionary<int, Dictionary<string, int>> MinuteRewardLists = new Dictionary<int, Dictionary<string, int>>() {
@@ -143,13 +143,13 @@ namespace Oxide.Plugins
             public Dictionary<ulong, double> PlayerDayStartTimes = new Dictionary<ulong, double>();
             public Dictionary<ulong, List<int>> PlayerClaimedRewards = new Dictionary<ulong, List<int>>();
         }
-        
+
         StoredData storedData;
 
-        private int highestRewardTime = 0; 
+        private int highestRewardTime = 0;
         void Loaded()
         {
-            Cfg = Config.ReadObject<ConfigFile>(); 
+            Cfg = Config.ReadObject<ConfigFile>();
             Plugin = this;
             permission.RegisterPermission(permUse, this);
 
@@ -233,7 +233,7 @@ namespace Oxide.Plugins
             reloadUI(player);
         }
 
-       
+
         void CommandOpenUi(BasePlayer player, string command, string[] args)
         {
             if (!permCheckVerbose(player, permUse)) return;
@@ -272,8 +272,8 @@ namespace Oxide.Plugins
             Item item;
             foreach (KeyValuePair<string, int> loot in Cfg.MinuteRewardLists[package])
             {
-                item = ItemManager.CreateByName(loot.Key, loot.Value);
-                player.GiveItem(item, BaseEntity.GiveItemReason.PickedUp);   
+                    item = ItemManager.CreateByName(loot.Key, loot.Value);
+                    player.GiveItem(item, BaseEntity.GiveItemReason.PickedUp);
             }
             SendReply(player, "You have claimed the " + package + "min reward!");
             SaveData();
@@ -313,7 +313,7 @@ namespace Oxide.Plugins
                 storedData.PlayerDayStartTimes.Add(player.userID, (double)playerTime);
             }
         }
-       
+
         private void ensureDayChange()
         {
             // reset every calendar day
@@ -329,16 +329,9 @@ namespace Oxide.Plugins
                 SaveData();
             }
         }
-        private string GetImage(string fileName, ulong skin = 0)
-        {
-            string imageId = (string)ImageLibrary.Call("GetImage", fileName, skin);
-            if (!string.IsNullOrEmpty(imageId))
-                return imageId;
-            return string.Empty;
-        }
         #endregion
 
-            #region GUI
+        #region GUI
 
         private const string globalNoErrorString = "none";
         private const string mainName = "TimedRewards";
@@ -389,7 +382,7 @@ namespace Oxide.Plugins
         private void displayUI(BasePlayer player, string errorMsg = globalNoErrorString)
         {
             GUIHeaderElement(player, mainName + "_head", errorMsg);
-            GUIContentElement(player, mainName+"_content");
+            GUIContentElement(player, mainName + "_content");
             GUIFooterElement(player, mainName + "_foot");
         }
         private void GUIHeaderElement(BasePlayer player, string elUiId, string errorMsg = globalNoErrorString)
@@ -488,11 +481,11 @@ namespace Oxide.Plugins
 
             int rewardCount = Cfg.MinuteRewardLists.Count();
             float localSpace = 0.005f;
-            float localboxWidth = (1f/rewardCount) - 1.5f*localSpace;
+            float localboxWidth = (1f / rewardCount) - 1.5f * localSpace;
             float localLeftBound = 1.5f * localSpace;
             float localRightBound = rewardCount * (localboxWidth + localSpace);
             float perMinuteWidth = 0.95f / highestRewardTime;
-            float playerTime = (float)Math.Floor(getTodayPlayTime(player)/60f);
+            float playerTime = (float)Math.Floor(getTodayPlayTime(player) / 60f);
             float localRewardTimeLine = 0;
             string rewardPanelName = "";
             float localLootRowTop = 0f;
@@ -646,20 +639,17 @@ namespace Oxide.Plugins
                         isEvenRow = true;
                     }
                     CuiRawImageComponent img;
-
-                    img = new CuiRawImageComponent { Png = GetImage(ItemManager.itemDictionaryByName[loot.Key].shortname) };
-                    
                     elements.Add(new CuiElement
                     {
                         Name = CuiHelper.GetGuid(),
                         Parent = rewardPanelName,
                         Components =
                         {
-                            img,
                             new CuiRectTransformComponent {
                                 AnchorMin = localLootLeft +" "+ (localLootRowTop-0.20f),
                                 AnchorMax = (localLootLeft + 0.35f) + " " + localLootRowTop
-                            }
+                            },
+                            new CuiImageComponent { ItemId = ItemManager.itemDictionaryByName[loot.Key].itemid }
                         }
                     });
                     elements.Add(new CuiLabel
@@ -803,4 +793,4 @@ namespace Oxide.Plugins
         #endregion
 
     }
-}   
+}

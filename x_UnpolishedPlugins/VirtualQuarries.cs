@@ -32,20 +32,20 @@ using Oxide.Game.Rust.Cui;
 
 namespace Oxide.Plugins
 {
-    [Info("VirtualQuarries", "DocValerian", "1.1.2")]
+    [Info("VirtualQuarries", "DocValerian", "1.2.0")]
     class VirtualQuarries : RustPlugin
     {
         static VirtualQuarries Plugin;
 
         [PluginReference]
-        private Plugin ImageLibrary, ServerRewards;
+        private Plugin ServerRewards;
         private const string permUse = "virtualquarries.use";
         private const string permProt = "virtualquarries.protected";
         bool HasPermission(string id, string perm) => permission.UserHasPermission(id, perm);
 
         #region DataConfig
         static ConfigFile Cfg = new ConfigFile();
-        class ConfigFile 
+        class ConfigFile
         {
             public int CostPerQuarry = 5000;
             public Dictionary<int, int> CostPerQuarryNumber = new Dictionary<int, int>()
@@ -101,15 +101,16 @@ namespace Oxide.Plugins
             ["hqm"] = "High Quality Metal Ore",
             ["crude"] = "Crude Oil",
         };
-        private string[] resList = {"stone","metal","sulfur","hqm"};
+        private string[] resList = { "stone", "metal", "sulfur", "hqm" };
 
-        private Dictionary<string, int> itemIDMap = new Dictionary<string, int>(){
+        private Dictionary<string, int> itemIDMap = new Dictionary<string, int>()
+        {
             ["surveycharge"] = 1975934948,
             ["lgf"] = -946369541,
             ["diesel"] = 1568388703,
 
         };
-        
+
         private Dictionary<ulong, MiningManager> _miningManager = new Dictionary<ulong, MiningManager>();
 
         private HashSet<BasePlayer> UiPlayers = new HashSet<BasePlayer>();
@@ -127,10 +128,10 @@ namespace Oxide.Plugins
             foreach (var player in UiPlayers)
                 CuiHelper.DestroyUi(player, Plugin.Name);
         }
-        private static void LoadData<T>(out T data, string filename = null) => 
+        private static void LoadData<T>(out T data, string filename = null) =>
         data = Interface.Oxide.DataFileSystem.ReadObject<T>(filename ?? Plugin.Name);
 
-        private static void SaveData<T>(T data, string filename = null) => 
+        private static void SaveData<T>(T data, string filename = null) =>
         Interface.Oxide.DataFileSystem.WriteObject(filename ?? Plugin.Name, data);
 
         #endregion
@@ -145,17 +146,18 @@ namespace Oxide.Plugins
 
             string errorMsg = "none";
 
-            if(player.inventory.GetAmount(itemIDMap["surveycharge"]) < 1){
+            if (player.inventory.GetAmount(itemIDMap["surveycharge"]) < 1)
+            {
                 errorMsg = "You need Survey Charges for that!";
-            } 
-            else 
+            }
+            else
             {
                 player.inventory.Take(null, itemIDMap["surveycharge"], 1);
                 MiningManager mm = MiningManager.Get(player.userID);
                 mm.RunSurvey();
             }
             reloadUI(player, errorMsg);
-            
+
         }
 
         [ConsoleCommand("virtualquarries.buyquarry")]
@@ -168,19 +170,19 @@ namespace Oxide.Plugins
 
 
             object bal = ServerRewards?.Call("CheckPoints", player.userID);
-            if(bal == null) return;
+            if (bal == null) return;
             int playerRP = (int)bal;
             MiningManager mm = MiningManager.Get(player.userID);
             int buyPrice = Cfg.CostPerQuarryNumber[mm.Quarries.Count()];
 
-            if(playerRP < buyPrice)
+            if (playerRP < buyPrice)
             {
                 errorMsg = "A quarry costs " + buyPrice + " RP, you only have " + playerRP;
             }
             else
-            {   
-                
-                if(mm.addQuarry())
+            {
+
+                if (mm.addQuarry())
                 {
                     ServerRewards?.Call("TakePoints", player.userID, buyPrice);
                 }
@@ -191,7 +193,7 @@ namespace Oxide.Plugins
             }
 
             reloadUI(player, errorMsg);
-            
+
         }
         [ConsoleCommand("virtualquarries.sellquarry")]
         private void CmdSellQ(ConsoleSystem.Arg arg)
@@ -202,11 +204,11 @@ namespace Oxide.Plugins
             string errorMsg = "none";
             int quarryId = arg.GetInt(0);
 
-            
+
             MiningManager mm = MiningManager.Get(player.userID);
             mm.takeFuel(player, quarryId);
             mm.takeRes(player, quarryId);
-            if(!mm.removeQuarry(quarryId))
+            if (!mm.removeQuarry(quarryId))
             {
                 errorMsg = "Invalid Quarry ID!";
             }
@@ -215,7 +217,7 @@ namespace Oxide.Plugins
                 SendReply(player, "Quarry has been destroyed");
             }
             reloadUI(player, errorMsg);
-        
+
         }
 
         [ConsoleCommand("virtualquarries.addfuel")]
@@ -229,10 +231,10 @@ namespace Oxide.Plugins
 
             string fuelType = arg.GetString(1);
             int fuelAmount = arg.GetInt(2);
-            
+
             int playerFuel = player.inventory.GetAmount(itemIDMap[fuelType]);
             MiningManager mm = MiningManager.Get(player.userID);
-            if(playerFuel < fuelAmount)
+            if (playerFuel < fuelAmount)
             {
                 errorMsg = "Not enough fuel in inventory!";
             }
@@ -244,7 +246,7 @@ namespace Oxide.Plugins
             reloadUI(player, errorMsg);
 
         }
-        
+
         [ConsoleCommand("virtualquarries.takefuel")]
         private void CmdTakeFuel(ConsoleSystem.Arg arg)
         {
@@ -253,12 +255,12 @@ namespace Oxide.Plugins
                 return;
             string errorMsg = "none";
             int quarryId = arg.GetInt(0);
-            
+
             MiningManager mm = MiningManager.Get(player.userID);
             mm.takeFuel(player, quarryId);
 
             reloadUI(player, errorMsg);
-            
+
         }
         [ConsoleCommand("virtualquarries.takeres")]
         private void CmdTakeRes(ConsoleSystem.Arg arg)
@@ -268,13 +270,13 @@ namespace Oxide.Plugins
                 return;
             string errorMsg = "none";
             int quarryId = arg.GetInt(0);
-            
+
             MiningManager mm = MiningManager.Get(player.userID);
             mm.takeRes(player, quarryId);
 
             reloadUI(player, errorMsg);
         }
-        
+
         [ConsoleCommand("virtualquarries.close")]
         private void CmdClose(ConsoleSystem.Arg arg)
         {
@@ -287,7 +289,7 @@ namespace Oxide.Plugins
         [ChatCommand("mm")]
         void QuarryCmd(BasePlayer player, string command, string[] args)
         {
-            if(HasPermission(player.UserIDString, permUse))
+            if (HasPermission(player.UserIDString, permUse))
             {
                 reloadUI(player);
             }
@@ -296,19 +298,23 @@ namespace Oxide.Plugins
                 SendReply(player, "You have no permission to use this command.");
             }
         }
-        
+
         #endregion
 
         #region Helpers
-        private void reloadUI(BasePlayer player, string errorMsg = "none"){
-            if(!UiPlayers.Contains(player)){
+        private void reloadUI(BasePlayer player, string errorMsg = "none")
+        {
+            if (!UiPlayers.Contains(player))
+            {
                 UiPlayers.Add(player);
             }
             CuiHelper.DestroyUi(player, Plugin.Name);
             displayInfo(player, errorMsg);
         }
-        private void killUI(BasePlayer player){
-            if(UiPlayers.Contains(player)){
+        private void killUI(BasePlayer player)
+        {
+            if (UiPlayers.Contains(player))
+            {
                 UiPlayers.Remove(player);
             }
             CuiHelper.DestroyUi(player, Plugin.Name);
@@ -326,7 +332,7 @@ namespace Oxide.Plugins
             private MiningEntity currentQuarry;
             public Dictionary<string, string> LastSurvey = new Dictionary<string, string>();
 
-             public MiningManager(ulong ownerId) : base()
+            public MiningManager(ulong ownerId) : base()
             {
                 ownerID = ownerId;
             }
@@ -334,7 +340,7 @@ namespace Oxide.Plugins
             {
                 if (Plugin._miningManager.ContainsKey(id))
                     return Plugin._miningManager[id];
-                
+
                 var fileName = $"{Plugin.Name}/{id}";
 
                 MiningManager manager;
@@ -358,10 +364,11 @@ namespace Oxide.Plugins
                 return manager;
             }
 
-            public void RunSurvey(){
+            public void RunSurvey()
+            {
                 Dictionary<string, string> survey = new Dictionary<string, string>();
                 System.Random random = new System.Random();
-                if(UnityEngine.Random.Range(0f, 1f) >= Cfg.SurveyEfficiency)
+                if (UnityEngine.Random.Range(0f, 1f) >= Cfg.SurveyEfficiency)
                 {
                     survey.Add("SurveyFailed", "true");
                     LastSurvey = survey;
@@ -371,21 +378,21 @@ namespace Oxide.Plugins
                 // determine types
                 string res1type = Plugin.resList[random.Next(0, Plugin.resList.Length)];
                 string res2type = string.Empty;
-                while(res2type == string.Empty || res2type == res1type)
+                while (res2type == string.Empty || res2type == res1type)
                 {
                     res2type = Plugin.resList[random.Next(0, Plugin.resList.Length)];
                 }
                 // get values
-                float res1val = UnityEngine.Random.Range(Cfg.ResPerMinute[res1type+"_min"], Cfg.ResPerMinute[res1type+"_max"]);
-                float res2val = UnityEngine.Random.Range(Cfg.ResPerMinute[res2type+"_min"], Cfg.ResPerMinute[res2type+"_max"]);
+                float res1val = UnityEngine.Random.Range(Cfg.ResPerMinute[res1type + "_min"], Cfg.ResPerMinute[res1type + "_max"]);
+                float res2val = UnityEngine.Random.Range(Cfg.ResPerMinute[res2type + "_min"], Cfg.ResPerMinute[res2type + "_max"]);
 
                 if (Quarries.Count() > Cfg.EfficiencyLossAfterQuarryNr)
                 {
                     int lossLevel = Quarries.Count() - Cfg.EfficiencyLossAfterQuarryNr;
-                    for(int i = 1; i <= lossLevel; i++)
+                    for (int i = 1; i <= lossLevel; i++)
                     {
-                        res1val *= (1-Cfg.EfficiencyLossPerQuarry);
-                        res2val *= (1-Cfg.EfficiencyLossPerQuarry);
+                        res1val *= (1 - Cfg.EfficiencyLossPerQuarry);
+                        res2val *= (1 - Cfg.EfficiencyLossPerQuarry);
                     }
                 }
 
@@ -397,17 +404,19 @@ namespace Oxide.Plugins
                 SaveData();
             }
 
-            public bool addQuarry(){
-                if(LastSurvey.Count < 2 || Quarries.Count() >= Cfg.MaxQuarries) return false;
+            public bool addQuarry()
+            {
+                if (LastSurvey.Count < 2 || Quarries.Count() >= Cfg.MaxQuarries) return false;
 
-                MiningEntity mine = new MiningEntity(ownerID, float.Parse(LastSurvey["res1val"]), float.Parse(LastSurvey["res2val"]), LastSurvey["res1type"],LastSurvey["res2type"]);
+                MiningEntity mine = new MiningEntity(ownerID, float.Parse(LastSurvey["res1val"]), float.Parse(LastSurvey["res2val"]), LastSurvey["res1type"], LastSurvey["res2type"]);
                 Quarries.Add(mine.entityId, mine);
                 LastSurvey = new Dictionary<string, string>();
                 SaveData();
                 return true;
             }
-            public bool removeQuarry(int quarryId){
-                if(!Quarries.ContainsKey(quarryId)) return false;
+            public bool removeQuarry(int quarryId)
+            {
+                if (!Quarries.ContainsKey(quarryId)) return false;
                 Quarries.Remove(quarryId);
                 SaveData();
                 return true;
@@ -416,9 +425,9 @@ namespace Oxide.Plugins
             public void addFuel(int quarryId, float amount, string type = "lgf")
             {
                 MiningEntity currentQuarry = Quarries[quarryId];
-                if(currentQuarry == null) return;
+                if (currentQuarry == null) return;
                 updateMine(quarryId);
-                switch(type)
+                switch (type)
                 {
                     case "lgf":
                         currentQuarry.currentFuel += amount;
@@ -435,40 +444,40 @@ namespace Oxide.Plugins
             public void takeFuel(BasePlayer player, int quarryId)
             {
                 MiningEntity currentQuarry = Quarries[quarryId];
-                if(currentQuarry == null) return;
+                if (currentQuarry == null) return;
                 updateMine(quarryId);
 
                 Item fuel;
-                if(currentQuarry.currentFuel > 0.0f)
+                if (currentQuarry.currentFuel > 0.0f)
                 {
-                    fuel = ItemManager.CreateByItemID(Plugin.itemIDMap["lgf"], (int) Math.Floor(currentQuarry.currentFuel), 0UL);
+                    fuel = ItemManager.CreateByItemID(Plugin.itemIDMap["lgf"], (int)Math.Floor(currentQuarry.currentFuel), 0UL);
                     player.GiveItem(fuel, BaseEntity.GiveItemReason.PickedUp);
                     currentQuarry.currentFuel = 0.0f;
                 }
-                if(currentQuarry.currentDiesel > 0.0f)
+                if (currentQuarry.currentDiesel > 0.0f)
                 {
-                    fuel = ItemManager.CreateByItemID(Plugin.itemIDMap["diesel"], (int) Math.Floor(currentQuarry.currentDiesel), 0UL);
+                    fuel = ItemManager.CreateByItemID(Plugin.itemIDMap["diesel"], (int)Math.Floor(currentQuarry.currentDiesel), 0UL);
                     player.GiveItem(fuel, BaseEntity.GiveItemReason.PickedUp);
                     currentQuarry.currentDiesel = 0.0f;
                 }
                 SaveData();
             }
-             public void takeRes(BasePlayer player, int quarryId)
+            public void takeRes(BasePlayer player, int quarryId)
             {
                 MiningEntity currentQuarry = Quarries[quarryId];
-                if(currentQuarry == null) return;
+                if (currentQuarry == null) return;
                 updateMine(quarryId);
 
                 Item res;
-                if(currentQuarry.currentAmountPrimary > 0.0f)
+                if (currentQuarry.currentAmountPrimary > 0.0f)
                 {
-                    res = ItemManager.CreateByName(Plugin.resPrefabs[currentQuarry.primaryResource], (int) Math.Floor(currentQuarry.currentAmountPrimary), 0UL);
+                    res = ItemManager.CreateByName(Plugin.resPrefabs[currentQuarry.primaryResource], (int)Math.Floor(currentQuarry.currentAmountPrimary), 0UL);
                     player.GiveItem(res, BaseEntity.GiveItemReason.PickedUp);
                     currentQuarry.currentAmountPrimary = 0.0f;
                 }
-                if(currentQuarry.currentAmountSecondary > 0.0f)
+                if (currentQuarry.currentAmountSecondary > 0.0f)
                 {
-                    res = ItemManager.CreateByName(Plugin.resPrefabs[currentQuarry.secondaryResource], (int) Math.Floor(currentQuarry.currentAmountSecondary), 0UL);
+                    res = ItemManager.CreateByName(Plugin.resPrefabs[currentQuarry.secondaryResource], (int)Math.Floor(currentQuarry.currentAmountSecondary), 0UL);
                     player.GiveItem(res, BaseEntity.GiveItemReason.PickedUp);
                     currentQuarry.currentAmountSecondary = 0.0f;
                 }
@@ -478,7 +487,7 @@ namespace Oxide.Plugins
             public void updateMine(int quarryId)
             {
                 MiningEntity currentQuarry = Quarries[quarryId];
-                if(currentQuarry == null) return;
+                if (currentQuarry == null) return;
 
                 currentQuarry.RunCalculation();
                 SaveData();
@@ -523,48 +532,48 @@ namespace Oxide.Plugins
 
             public float FuelForHours()
             {
-                return (currentFuel/FuelPerHour + currentDiesel/DieselPerHour);
+                return (currentFuel / FuelPerHour + currentDiesel / DieselPerHour);
             }
 
             public void RunCalculation()
             {
-                DateTime runtime = DateTime.Now;            
-                TimeSpan span = runtime.Subtract( lastAccessTime );
+                DateTime runtime = DateTime.Now;
+                TimeSpan span = runtime.Subtract(lastAccessTime);
                 int minutesSinceLastCalc = (int)Math.Floor(span.TotalMinutes);
                 // update access time to now
                 lastAccessTime = runtime;
                 float dieselBonus = (currentDiesel > 0f) ? Cfg.DieselEfficiencyBoost : 1;
 
                 // not running at all
-                if(!IsRunning()) return;
+                if (!IsRunning()) return;
                 // we ran out of fuel somewhere
-                if(FuelForHours()*60 <= minutesSinceLastCalc)
+                if (FuelForHours() * 60 <= minutesSinceLastCalc)
                 {
                     float fuelForMinutes;
-                    if(currentDiesel > 0f) 
+                    if (currentDiesel > 0f)
                     {
-                        fuelForMinutes = (currentDiesel/DieselPerHour)*60;
+                        fuelForMinutes = (currentDiesel / DieselPerHour) * 60;
                         currentDiesel = 0.0f;
-                    } 
+                    }
                     else
                     {
-                        fuelForMinutes = (currentFuel/FuelPerHour)*60;
+                        fuelForMinutes = (currentFuel / FuelPerHour) * 60;
                         currentFuel = 0.0f;
                     }
-                    currentAmountPrimary += fuelForMinutes*miningPerMinutePrimary*dieselBonus;
-                    currentAmountSecondary += fuelForMinutes*miningPerMinuteSecondary*dieselBonus;
+                    currentAmountPrimary += fuelForMinutes * miningPerMinutePrimary * dieselBonus;
+                    currentAmountSecondary += fuelForMinutes * miningPerMinuteSecondary * dieselBonus;
                 }
                 else
                 { // enough fuel for the entire time.
-                    currentAmountPrimary += minutesSinceLastCalc*miningPerMinutePrimary*dieselBonus;
-                    currentAmountSecondary += minutesSinceLastCalc*miningPerMinuteSecondary*dieselBonus;
-                    if(currentDiesel > 0f) 
+                    currentAmountPrimary += minutesSinceLastCalc * miningPerMinutePrimary * dieselBonus;
+                    currentAmountSecondary += minutesSinceLastCalc * miningPerMinuteSecondary * dieselBonus;
+                    if (currentDiesel > 0f)
                     {
-                        currentDiesel -= minutesSinceLastCalc*(DieselPerHour/60);
-                    } 
+                        currentDiesel -= minutesSinceLastCalc * (DieselPerHour / 60);
+                    }
                     else
                     {
-                        currentFuel -= minutesSinceLastCalc*(FuelPerHour/60);
+                        currentFuel -= minutesSinceLastCalc * (FuelPerHour / 60);
                     }
                 }
             }
@@ -577,12 +586,12 @@ namespace Oxide.Plugins
         {
             var mainName = Plugin.Name;
             var elements = new CuiElementContainer();
-            
+
             elements.Add(new CuiPanel
             {
                 Image =
                 {
-                    Color = "0 0 0 0.5", 
+                    Color = "0 0 0 0.5",
                     Material = "assets/content/ui/uibackgroundblur-ingamemenu.mat"
                 },
                 RectTransform =
@@ -647,7 +656,7 @@ namespace Oxide.Plugins
                 }
             }, mainName);
 
-            if(errorMsg != "none")
+            if (errorMsg != "none")
             {
                 elements.Add(new CuiLabel
                 {
@@ -679,7 +688,7 @@ namespace Oxide.Plugins
                 },
                 CursorEnabled = true
             }, mainName);
-            
+
             elements.Add(new CuiLabel
             {
                 Text =
@@ -695,7 +704,7 @@ namespace Oxide.Plugins
                     AnchorMax = "0.15 0.7"
                 }
             }, mainName);
-            
+
             MiningManager mm = MiningManager.Get(player.userID);
             GUIManagerWindow(player, elements, mainName, mm);
             GUIQuarryWindow(player, elements, mainName, mm);
@@ -728,7 +737,7 @@ namespace Oxide.Plugins
                 }
             }, mainName);
 
-            if(mm.Quarries.Count() >= Cfg.MaxQuarries)
+            if (mm.Quarries.Count() >= Cfg.MaxQuarries)
             {
                 elements.Add(new CuiLabel
                 {
@@ -747,7 +756,7 @@ namespace Oxide.Plugins
                 }, mainName);
                 return;
             }
-            
+
             elements.Add(new CuiButton
             {
                 Button =
@@ -770,7 +779,7 @@ namespace Oxide.Plugins
             }, mainName);
 
             string analysisInfoText = "You must run survey first! (click the button)";
-            if(mm.LastSurvey.Count > 0 && !mm.LastSurvey.ContainsKey("SurveyFailed"))
+            if (mm.LastSurvey.Count > 0 && !mm.LastSurvey.ContainsKey("SurveyFailed"))
             {
                 analysisInfoText = "Analysis Results:";
                 var res1type = mm.LastSurvey["res1type"];
@@ -888,7 +897,7 @@ namespace Oxide.Plugins
                     }
                 }, mainName);
             }
-             if(mm.LastSurvey.Count > 0 && mm.LastSurvey.ContainsKey("SurveyFailed"))
+            if (mm.LastSurvey.Count > 0 && mm.LastSurvey.ContainsKey("SurveyFailed"))
             {
                 analysisInfoText = "Survey found nothing.";
             }
@@ -907,7 +916,7 @@ namespace Oxide.Plugins
                     AnchorMax = leftWidth+" "+(contentStart - 3*buttonHeight-space)
                 }
             }, mainName);
-            
+
 
         }
 
@@ -921,9 +930,9 @@ namespace Oxide.Plugins
             float leftWidth = 0.99f;
             float space = 0.02f;
             float lineHeight = imgSize + space;
-            
+
             float fuelLeftBoundary = 0.505f;
-            float contLeftBoundary = fuelLeftBoundary+imgSize+0.02f+imgResSize;
+            float contLeftBoundary = fuelLeftBoundary + imgSize + 0.02f + imgResSize;
 
             int playerCharges = player.inventory.GetAmount(itemIDMap["surveycharge"]);
             elements.Add(new CuiLabel
@@ -942,12 +951,12 @@ namespace Oxide.Plugins
                 }
             }, mainName);
             int i = 1;
-            contentStart -= (buttonHeight+space);
+            contentStart -= (buttonHeight + space);
             // main "Each Quarry" loop
-            foreach(KeyValuePair<int,MiningEntity> mine in mm.Quarries)
+            foreach (KeyValuePair<int, MiningEntity> mine in mm.Quarries)
             {
                 MiningEntity currentMine = mine.Value;
-                int mineId = mine.Key; 
+                int mineId = mine.Key;
                 mm.updateMine(mineId);
 
                 string resPrime = Plugin.resPrefabs[currentMine.primaryResource];
@@ -957,17 +966,17 @@ namespace Oxide.Plugins
                 double secPerMin = Math.Round(currentMine.miningPerMinuteSecondary, 2);
 
                 string fuelType;
-                if(currentMine.FuelForHours() == 0f)
+                if (currentMine.FuelForHours() == 0f)
                 {
                     fuelType = "empty";
                 }
                 else if (currentMine.currentDiesel > 0f)
                 {
                     fuelType = "diesel_barrel";
-                    primePerMin = Math.Round(primePerMin*Cfg.DieselEfficiencyBoost, 2);
-                    secPerMin = Math.Round(secPerMin*Cfg.DieselEfficiencyBoost, 2);
+                    primePerMin = Math.Round(primePerMin * Cfg.DieselEfficiencyBoost, 2);
+                    secPerMin = Math.Round(secPerMin * Cfg.DieselEfficiencyBoost, 2);
                 }
-                else 
+                else
                 {
                     fuelType = "lowgradefuel";
                 }
@@ -993,7 +1002,7 @@ namespace Oxide.Plugins
                     Parent = mainName,
                     Components =
                     {
-                        new CuiRawImageComponent {Png = GetImage("mining.quarry") },
+                        new CuiImageComponent { ItemId = ItemManager.itemDictionaryByName["mining.quarry"].itemid },
                         new CuiRectTransformComponent {
                             AnchorMin = leftBoundary +" "+(contentStart-lineHeight),
                             AnchorMax = (leftBoundary+imgSize)+" "+contentStart
@@ -1018,7 +1027,7 @@ namespace Oxide.Plugins
                     }
                 }, mainName);
                 var ts = TimeSpan.FromHours(currentMine.FuelForHours());
-                string stateText = (state == "off") ? "(" +state+ ")" : "(" +state+ " - "+Math.Floor(currentMine.FuelForHours())+"h "+ ts.Minutes +"min remaining)";
+                string stateText = (state == "off") ? "(" + state + ")" : "(" + state + " - " + Math.Floor(currentMine.FuelForHours()) + "h " + ts.Minutes + "min remaining)";
                 elements.Add(new CuiLabel
                 {
                     Text =
@@ -1059,9 +1068,9 @@ namespace Oxide.Plugins
 
 
                 // resource panel
-                float resLeftOverview = leftBoundary+imgSize+0.002f;
-                float resLeftBoundary = resLeftOverview+0.18f;
-                string dieselBonusString = (fuelType == "diesel_barrel") ? "(Diesel-Bonus x"+Cfg.DieselEfficiencyBoost+")" : "";
+                float resLeftOverview = leftBoundary + imgSize + 0.002f;
+                float resLeftBoundary = resLeftOverview + 0.18f;
+                string dieselBonusString = (fuelType == "diesel_barrel") ? "(Diesel-Bonus x" + Cfg.DieselEfficiencyBoost + ")" : "";
                 elements.Add(new CuiLabel
                 {
                     Text =
@@ -1091,14 +1100,14 @@ namespace Oxide.Plugins
                     },
                     CursorEnabled = true
                 }, mainName);
-                
+
                 elements.Add(new CuiElement
                 {
                     Name = CuiHelper.GetGuid(),
                     Parent = mainName,
                     Components =
                     {
-                        new CuiRawImageComponent {Png = GetImage(resPrime) },
+                        new CuiImageComponent { ItemId = ItemManager.itemDictionaryByName[resPrime].itemid },
                         new CuiRectTransformComponent {
                             AnchorMin = (resLeftBoundary) +" "+(contentStart-lineHeight),
                             AnchorMax = (resLeftBoundary+imgResSize) +" "+ (contentStart-buttonHeight)
@@ -1120,7 +1129,7 @@ namespace Oxide.Plugins
                         AnchorMax = (resLeftBoundary+imgResSize-0.002) +" "+ (contentStart-2*buttonHeight-0.016)
                     }
                 }, mainName);
-                float resLeftBoundary2 = resLeftBoundary+imgResSize+0.005f;
+                float resLeftBoundary2 = resLeftBoundary + imgResSize + 0.005f;
                 elements.Add(new CuiPanel
                 {
                     Image =
@@ -1134,14 +1143,14 @@ namespace Oxide.Plugins
                     },
                     CursorEnabled = true
                 }, mainName);
-                
+
                 elements.Add(new CuiElement
                 {
                     Name = CuiHelper.GetGuid(),
                     Parent = mainName,
                     Components =
                     {
-                        new CuiRawImageComponent {Png = GetImage(resSec) },
+                        new CuiImageComponent { ItemId = ItemManager.itemDictionaryByName[resSec].itemid },
                         new CuiRectTransformComponent {
                             AnchorMin = (resLeftBoundary2) +" "+(contentStart-lineHeight),
                             AnchorMax = (resLeftBoundary2+imgResSize) +" "+ (contentStart-buttonHeight)
@@ -1164,8 +1173,8 @@ namespace Oxide.Plugins
                     }
                 }, mainName);
 
-                
-                float resLeftBoundary3 = resLeftBoundary2+imgResSize+0.005f;
+
+                float resLeftBoundary3 = resLeftBoundary2 + imgResSize + 0.005f;
 
                 elements.Add(new CuiButton
                 {
@@ -1224,8 +1233,9 @@ namespace Oxide.Plugins
                     CursorEnabled = true
                 }, mainName);
 
-                if(fuelType == "empty"){
-                    
+                if (fuelType == "empty")
+                {
+
                     elements.Add(new CuiLabel
                     {
                         Text =
@@ -1241,7 +1251,7 @@ namespace Oxide.Plugins
                             AnchorMax = (contLeftBoundary) +" "+ (contentStart-buttonHeight)
                         }
                     }, mainName);
-                    
+
                     elements.Add(new CuiButton
                     {
                         Button =
@@ -1262,7 +1272,7 @@ namespace Oxide.Plugins
                             Color = "1 1 1 1"
                         }
                     }, mainName);
-                    
+
                     elements.Add(new CuiButton
                     {
                         Button =
@@ -1283,17 +1293,17 @@ namespace Oxide.Plugins
                             Color = "1 1 1 1"
                         }
                     }, mainName);
-                } 
-                else if(fuelType == "lowgradefuel")
+                }
+                else if (fuelType == "lowgradefuel")
                 {
-                    
+
                     elements.Add(new CuiElement
                     {
                         Name = CuiHelper.GetGuid(),
                         Parent = mainName,
                         Components =
                         {
-                            new CuiRawImageComponent {Png = GetImage(fuelType) },
+                            new CuiImageComponent { ItemId = ItemManager.itemDictionaryByName[fuelType].itemid },
                             new CuiRectTransformComponent {
                                 AnchorMin = (fuelLeftBoundary+imgSize+0.02f) +" "+(contentStart-lineHeight),
                                 AnchorMax = (contLeftBoundary) +" "+ (contentStart-buttonHeight)
@@ -1356,7 +1366,7 @@ namespace Oxide.Plugins
                             Color = "1 1 1 1"
                         }
                     }, mainName);
-                    contLeftBoundary2 = (float)(contLeftBoundary+buttonWidth+0.002);
+                    contLeftBoundary2 = (float)(contLeftBoundary + buttonWidth + 0.002);
                     elements.Add(new CuiButton
                     {
                         Button =
@@ -1377,7 +1387,7 @@ namespace Oxide.Plugins
                             Color = "1 1 1 1"
                         }
                     }, mainName);
-                    contLeftBoundary3 = (float)(contLeftBoundary2+buttonWidth+0.002);
+                    contLeftBoundary3 = (float)(contLeftBoundary2 + buttonWidth + 0.002);
                     elements.Add(new CuiButton
                     {
                         Button =
@@ -1400,16 +1410,16 @@ namespace Oxide.Plugins
                     }, mainName);
 
                 }
-                else if(fuelType == "diesel_barrel")
+                else if (fuelType == "diesel_barrel")
                 {
-                    
+
                     elements.Add(new CuiElement
                     {
                         Name = CuiHelper.GetGuid(),
                         Parent = mainName,
                         Components =
                         {
-                            new CuiRawImageComponent {Png = GetImage(fuelType) },
+                            new CuiImageComponent { ItemId = ItemManager.itemDictionaryByName[fuelType].itemid },
                             new CuiRectTransformComponent {
                                 AnchorMin = (fuelLeftBoundary+imgSize+0.02f) +" "+(contentStart-lineHeight),
                                 AnchorMax = (contLeftBoundary) +" "+ (contentStart-buttonHeight)
@@ -1452,7 +1462,7 @@ namespace Oxide.Plugins
                         }
                     }, mainName);
 
-                    
+
                     elements.Add(new CuiButton
                     {
                         Button =
@@ -1473,7 +1483,7 @@ namespace Oxide.Plugins
                             Color = "1 1 1 1"
                         }
                     }, mainName);
-                    contLeftBoundary2 = (float)(contLeftBoundary+buttonWidth+0.002);
+                    contLeftBoundary2 = (float)(contLeftBoundary + buttonWidth + 0.002);
                     elements.Add(new CuiButton
                     {
                         Button =
@@ -1494,7 +1504,7 @@ namespace Oxide.Plugins
                             Color = "1 1 1 1"
                         }
                     }, mainName);
-                    contLeftBoundary3 = (float)(contLeftBoundary2+buttonWidth+0.002);
+                    contLeftBoundary3 = (float)(contLeftBoundary2 + buttonWidth + 0.002);
                     elements.Add(new CuiButton
                     {
                         Button =
@@ -1517,21 +1527,15 @@ namespace Oxide.Plugins
                     }, mainName);
 
                 }
-                
+
 
                 // next line
-                contentStart -= lineHeight+space;
+                contentStart -= lineHeight + space;
                 i++;
             }
         }
         #endregion
 
-        private string GetImage(string fileName, ulong skin = 0)
-        {
-            string imageId = (string)ImageLibrary.Call("GetImage", fileName, skin);
-            if (!string.IsNullOrEmpty(imageId))
-                return imageId;
-            return string.Empty;
-        }
+
     }
-}   
+}

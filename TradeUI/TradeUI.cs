@@ -34,13 +34,10 @@ using Newtonsoft.Json;
 
 namespace Oxide.Plugins
 {
-    [Info("TradeUI", "DocValerian", "1.7.5")]
+    [Info("TradeUI", "DocValerian", "1.8.0")]
     class TradeUI : RustPlugin
     {
         static TradeUI Plugin;
-
-        [PluginReference]
-        private Plugin ImageLibrary;
 
         const string permUse = "tradeui.use";
         bool HasPermission(string id, string perm) => permission.UserHasPermission(id, perm);
@@ -187,7 +184,6 @@ namespace Oxide.Plugins
             // preload item icons - this might be excessive, but the list is very dynamic otherwise
             // this way the load should only happen once and have all icons prewarmed
             List<KeyValuePair<string, ulong>> itemIconList = ItemManager.GetItemDefinitions().Select(itemDef => new KeyValuePair<string, ulong>(itemDef.shortname, 0)).ToList();
-            ImageLibrary.Call("LoadImageList", Title, itemIconList, null);
         }
         void Unload()
         {
@@ -1098,7 +1094,7 @@ namespace Oxide.Plugins
                                     sortedItems.Add(kv);
                                     tempItemsAdded.Add(kv.Key);
                                     catItems[ItemManager.itemDictionary[kv.Key].category.ToString("G")] += 1;
-                                 }
+                                }
                             }
                         }
                     }
@@ -1166,7 +1162,7 @@ namespace Oxide.Plugins
                 }
                 }, elUiId);
             }
-            
+
             numItems = 0;
             foreach (KeyValuePair<int, List<ulong>> kv in sortedItems)
             {
@@ -1190,7 +1186,8 @@ namespace Oxide.Plugins
                     Parent = elUiId,
                     Components =
                     {
-                        new CuiRawImageComponent {Png = GetImage(ItemManager.itemDictionary[kv.Key].shortname) },
+                        //toDo think about utilizing skins here, too
+                        new CuiImageComponent { ItemId = kv.Key, SkinId = 0 },
                         new CuiRectTransformComponent {
                             AnchorMin = (localLeftBoundary+0.005f) +" "+ (localContentStart-buttonHeight+0.01f),
                             AnchorMax = (localLeftBoundary + cellWidth-0.005f) + " "+ localContentStart
@@ -1243,7 +1240,7 @@ namespace Oxide.Plugins
                                 Align = TextAnchor.MiddleCenter,
                                 Color = "1 1 1 1"
                             }
-                }, elUiId); 
+                }, elUiId);
                 elements.Add(new CuiButton
                 {
                     Button =
@@ -1340,7 +1337,8 @@ namespace Oxide.Plugins
                 Parent = elUiId,
                 Components =
                 {
-                    new CuiRawImageComponent {Png = GetImage(ItemManager.itemDictionary[itemSoldId].shortname) },
+                    //toDo think about utilizing skins here, too
+                    new CuiImageComponent { ItemId = itemSoldId, SkinId = 0 },
                     new CuiRectTransformComponent {
                         AnchorMin = "0.47 0.9",
                         AnchorMax = "0.53 0.995"
@@ -1372,7 +1370,7 @@ namespace Oxide.Plugins
                 */
 
                 var inventory = v.sellOrders.sellOrders;
-                string cleanName = Regex.Replace(v.shopName, @"[^a-zA-Z0-9.\-+ <>=/]+", ""); ; 
+                string cleanName = Regex.Replace(v.shopName, @"[^a-zA-Z0-9.\-+ <>=/]+", ""); ;
                 string itemStr = "SHOP: " + cleanName + "\nPrice:";
 
                 bool isMyShop = (v.OwnerID == player.userID);
@@ -1634,7 +1632,8 @@ namespace Oxide.Plugins
                     Parent = vendorUID,
                     Components =
                         {
-                            new CuiRawImageComponent {Png = GetImage(ItemManager.itemDictionary[sellOrder.itemToSellID].shortname) },
+                            //toDo think about utilizing skins here, too
+                            new CuiImageComponent { ItemId = sellOrder.itemToSellID, SkinId = 0 },
                             new CuiRectTransformComponent {
                                 AnchorMin = "0.01 "+ (localShopRowTop-0.3f),
                                 AnchorMax = "0.23 " + localShopRowTop
@@ -1679,7 +1678,7 @@ namespace Oxide.Plugins
                     Parent = vendorUID,
                     Components =
                         {
-                            new CuiRawImageComponent {Png = GetImage(ItemManager.itemDictionary[sellOrder.currencyID].shortname) },
+                            new CuiImageComponent { ItemId = sellOrder.currencyID },
                             new CuiRectTransformComponent {
                                 AnchorMin = "0.77 "+ (localShopRowTop-0.3f),
                                 AnchorMax = "0.99 " + localShopRowTop
@@ -1751,7 +1750,7 @@ namespace Oxide.Plugins
                     Parent = vendorUID,
                     Components =
                         {
-                            new CuiRawImageComponent {Png = GetImage(ItemManager.itemDictionary[sellOrder.currencyID].shortname) },
+                            new CuiImageComponent { ItemId = sellOrder.currencyID },
                             new CuiRectTransformComponent {
                                 AnchorMin = localLeft +" "+ (localShopRowTop-0.3f),
                                 AnchorMax = (localLeft+localIconSize)+" " + localShopRowTop
@@ -1902,7 +1901,8 @@ namespace Oxide.Plugins
                 Parent = elUiId,
                 Components =
                         {
-                            new CuiRawImageComponent {Png = GetImage(ItemManager.itemDictionary[sellOrder.itemToSellID].shortname) },
+                            //toDo think about utilizing skins here, too
+                            new CuiImageComponent { ItemId = sellOrder.itemToSellID, SkinId = 0 },
                             new CuiRectTransformComponent {
                                 AnchorMin = "0.25 0.4",
                                 AnchorMax = "0.35 0.7"
@@ -1969,7 +1969,7 @@ namespace Oxide.Plugins
                 Parent = elUiId,
                 Components =
                         {
-                            new CuiRawImageComponent {Png = GetImage(ItemManager.itemDictionary[sellOrder.currencyID].shortname) },
+                            new CuiImageComponent { ItemId = sellOrder.currencyID },
                             new CuiRectTransformComponent {
                                 AnchorMin = "0.65 0.4",
                                 AnchorMax = "0.75 0.7"
@@ -2170,11 +2170,11 @@ namespace Oxide.Plugins
             float itemwidth = (1f / 6f) - 0.02f;
             int rownum = 0;
             int itemnum = 0;
-           
+
             while(itemnum < 24)
             {
                 Item i = player.inventory.containerMain.GetSlot(itemnum);
-                
+
                 if (itemnum > 0 && itemnum % 6 == 0)
                 {
                     localLeft = 0f;
@@ -2207,7 +2207,7 @@ namespace Oxide.Plugins
                         Parent = parentID + "_i" + itemnum,
                         Components =
                             {
-                                new CuiRawImageComponent {Png = GetImage(i.info.shortname) },
+                                new CuiImageComponent { ItemId = i.info.itemid, SkinId = i.skin },
                                 new CuiRectTransformComponent {
                                     AnchorMin = "0.2 0.15",
                                     AnchorMax = "0.8 0.85"
@@ -2236,12 +2236,12 @@ namespace Oxide.Plugins
                             Command = "tradeui.opensell " + i.info.shortname,
                             Color = "0.56 0.12 0.12 0"
                         },
-                                RectTransform =
+                        RectTransform =
                         {
                             AnchorMin = localLeft + " " + (localTop - itemheight),
                             AnchorMax = (localLeft + itemwidth) + " " + localTop
                         },
-                                Text =
+                        Text =
                         {
                             Text = "",
                             FontSize = 12,
@@ -2258,13 +2258,7 @@ namespace Oxide.Plugins
         #endregion
 
         private Dictionary<string, string> ImageCache = new Dictionary<string, string>();
-        private string GetImage(string fileName, ulong skin = 0)
-        {
-            string imageId = (string)ImageLibrary.Call("GetImage", fileName, skin);
-            if (!string.IsNullOrEmpty(imageId))
-                return imageId;
-            return string.Empty;
-        }
+
 
     }
 }
